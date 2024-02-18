@@ -2,6 +2,7 @@ import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import NavBar from "@/components/NavBar";
 import { Inter as FontSans } from "next/font/google"
+import { SpeedInsights } from "@vercel/speed-insights/next"
  
 import { cn } from "../lib/utils"
  
@@ -16,8 +17,8 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Next.js and Supabase Starter Kit",
-  description: "The fastest way to build apps with Next.js and Supabase",
+  title: "Elite Housing",
+  description: "Your home renovation experts",
 };
 
 export default function RootLayout({
@@ -38,6 +39,7 @@ export default function RootLayout({
           <NavBar/>
           {children}
         </main>
+        <SpeedInsights />
       </body>
     </html>
   );
