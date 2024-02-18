@@ -3,8 +3,6 @@ import { createClient, updateSession } from "@/utils/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
   const {user, response} =  await updateSession(request);
-  console.log(user)
-  console.log(request.nextUrl.pathname)
 
   if (request.nextUrl.pathname.startsWith('/admin/') && !user) {
       return NextResponse.redirect(new URL('/admin', request.url))
