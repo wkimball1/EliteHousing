@@ -1,8 +1,18 @@
-import { type NextRequest } from "next/server";
-import { updateSession } from "@/utils/supabase/middleware";
+import { NextResponse, type NextRequest } from "next/server";
+import { createClient, updateSession } from "@/utils/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
-  return await updateSession(request);
+  const {user, response} =  await updateSession(request);
+  console.log(user)
+  console.log(request.nextUrl.pathname)
+
+  if (request.nextUrl.pathname.startsWith('/admin/') && !user) {
+      return NextResponse.redirect(new URL('/admin', request.url))
+  }
+
+
+
+  return response
 }
 
 export const config = {
