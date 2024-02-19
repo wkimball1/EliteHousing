@@ -30,7 +30,7 @@ export default function LoginPage({
 
 
   return (
-    <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2">
+    <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2 items-center">
 
       <form
         className="animate-in flex-1 flex flex-col w-full justify-center gap-2 text-foreground"
