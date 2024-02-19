@@ -3,6 +3,7 @@ import "./globals.css";
 import NavBar from "@/components/NavBar";
 import { Inter as FontSans } from "next/font/google"
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { ThemeProvider } from "@/components/ui/theme-provider"
  
 import { cn } from "../lib/utils"
  
@@ -35,10 +36,17 @@ export default function RootLayout({
           fontSans.variable
         )}
       >
-        <main className="min-h-screen flex flex-col">
-          <NavBar/>
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+        <main className="relative min-h-screen flex flex-col">
+          {/* <NavBar/> */}
           {children}
         </main>
+        </ThemeProvider>
         <SpeedInsights />
       </body>
     </html>
