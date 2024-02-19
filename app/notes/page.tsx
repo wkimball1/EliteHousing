@@ -1,38 +1,16 @@
-'use client';
-import { createClient } from '@/utils/supabase/client';
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import AuthButton from '@/components/AuthButton';
+import NavBar from '@/components/NavBar';
+import { createClient } from '@/utils/supabase/server';
 
-export default function Note() {
-  const [notes, setNotes] = useState<any[] | null>(null)
-  const [userData, setUser] = useState<any | null>(null)
-  const [loading, setLoading] = useState(true)
-  const supabase = createClient()
-  const router = useRouter();
-
-
-
-    
-
-  useEffect(() => {
-
-      
-    const getData = async () => {
-      const { data } = await supabase.from('notes').select()
-      setNotes(data)
-      setLoading(false)
-      
-    }
-
-    getData()
-
-  }, [])
-
+export default async function Notes() {
+  const supabase = createClient();
+  const { data: notes } = await supabase.from("notes").select();
   
-
-  
-  if (loading){
-    return <h1>loading...</h1>
-  }
-  return <pre>{JSON.stringify(notes, null, 2)}</pre>
+  return(
+    <div className='flex flex-col'>
+      <NavBar>
+        <AuthButton/>
+      </NavBar>
+      {/* <pre className='py-16 px-2 '>{JSON.stringify(notes, null, 2)}</pre> */}
+    </div>)
 }

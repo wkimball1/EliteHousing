@@ -3,6 +3,8 @@ import { headers } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import AuthButton from "@/components/AuthButton";
+import NavBar from "@/components/NavBar";
 
 export default function LoginPage({
   searchParams,
@@ -30,7 +32,12 @@ export default function LoginPage({
 
 
   return (
+    <div className="flex-1 flex flex-col w-full">
+      <NavBar>
+         <AuthButton/>
+      </NavBar>
     <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md self-center justify-center gap-2">
+      
       <form
         className="animate-in flex-1 flex flex-col w-full justify-center gap-2 text-foreground"
         action={signIn}
@@ -54,7 +61,7 @@ export default function LoginPage({
           placeholder="••••••••"
           required
         />
-        <Button className="hidden px-4 py-2 font-sans text-xs font-bold text-center text-foreground uppercase align-middle transition-all rounded-lg select-none hover:bg-gray-900/10 active:bg-gray-900/20 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none lg:inline-block">
+        <Button className="px-4 py-2 font-sans text-xs font-bold text-center text-foreground uppercase align-middle transition-all rounded-lg select-none hover:bg-background/10 active:bg-background/20 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none sm:inline-block">
           Sign In
         </Button>
         {searchParams?.message && (
@@ -63,6 +70,7 @@ export default function LoginPage({
           </p>
         )}
       </form>
+    </div>
     </div>
   );
 }

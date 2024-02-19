@@ -6,10 +6,10 @@ import { useRouter, usePathname } from 'next/navigation'
 import { SlHome } from 'react-icons/sl'
 import { BsInfoSquare, BsEnvelopeAt } from 'react-icons/bs'
 import { FaTshirt, FaRedhat } from 'react-icons/fa'
+import { MdOutlineWeb } from "react-icons/md";
 import defaultLogo from '@/img/logo.png';
 import darkLogo from '@/img/logo-white.png';
 
-import logo from '@/img/logo.png'
 
 export default function Sidebar({show, setter} : {show:any, setter:Function}) {
     const router = useRouter();
@@ -57,16 +57,18 @@ export default function Sidebar({show, setter} : {show:any, setter:Function}) {
         <>
             <div className={`${className}${appendClass}`}>
                 <div className="p-2 flex">
-                    <Link href="/">
-                        {/*eslint-disable-next-line*/}
-                        <img src={defaultLogo.src} alt="Company Logo" width={200} height={150} className="lightLogo"/>
-                        <img src={darkLogo.src} alt="Company Logo" width={200} height={150} className="darkLogo"/>
+                    <Link href="/admin/dashboard" onClick={() => {
+                        setter((oldVal: any) => !oldVal);
+                    }}>
+                        <img src={defaultLogo.src} alt="Company Logo" width={150} height={150} className="lightLogo"/>
+                        <img src={darkLogo.src} alt="Company Logo" width={150} height={150} className="darkLogo"/>
+                        
                     </Link>
                 </div>
                 <div className="flex flex-col">
                     <MenuItem
                         name="Home"
-                        route="/"
+                        route="/admin/dashboard"
                         icon={<SlHome />}
                     />
                     <MenuItem
@@ -85,9 +87,9 @@ export default function Sidebar({show, setter} : {show:any, setter:Function}) {
                         icon={<BsInfoSquare />}
                     />
                     <MenuItem
-                        name="Contact"
-                        route="/contact"
-                        icon={<BsEnvelopeAt />}
+                        name="Client Website"
+                        route="/"
+                        icon={<MdOutlineWeb/>}
                     />
                 </div>
             </div>

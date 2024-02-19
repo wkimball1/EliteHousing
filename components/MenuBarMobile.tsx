@@ -10,9 +10,9 @@ import logo from '@/img/logo.png'
 
 export default function MenuBarMobile( {setter} : {setter:Function} ) {
     return (
-        <nav className="md:hidden z-20 fixed top-0 left-0 right-0 h-[60px] bg-black flex [&>*]:my-auto px-2">
+        <nav className="md:hidden z-20 fixed top-0 left-0 right-0 h-[60px] bg-background flex [&>*]:my-auto px-2">
             <button
-                className="text-4xl flex text-white"
+                className="text-4xl flex text-foreground"
                 onClick={() => {
                     setter((oldVal: any) => !oldVal);
                 }}
@@ -21,12 +21,12 @@ export default function MenuBarMobile( {setter} : {setter:Function} ) {
             </button>
             <Link href="/" className="mx-auto">
                 {/*eslint-disable-next-line*/}
-                <img src={defaultLogo.src} alt="Company Logo" width={50} height={50} className="lightLogo"/>
-          <img src={darkLogo.src} alt="Company Logo" width={50} height={50} className="darkLogo"/>
+                <img src={defaultLogo.src} alt="Company Logo" width={150} height={150} className="lightLogo"/>
+          <img src={darkLogo.src} alt="Company Logo" width={150} height={150} className="darkLogo"/>
             </Link>
             <Link
                 className="text-3xl flex text-white"
-                href="/login"
+                href="/admin/dashboard"
             >
                 <FaUser />
             </Link>

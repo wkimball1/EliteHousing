@@ -6,6 +6,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import { ThemeProvider } from "@/components/ui/theme-provider"
  
 import { cn } from "../lib/utils"
+import AuthButton from "@/components/AuthButton";
  
 const fontSans = FontSans({
   subsets: ["latin"],

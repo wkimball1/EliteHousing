@@ -12,10 +12,10 @@ export default function DashboardLayout({ children } : {children: React.ReactNod
 
     return (
         <div className="min-h-screen">
-            <div className="flex">
+            <div className="flex min-h-screen">
                 <MenuBarMobile setter={setShowSidebar} />
                 <Sidebar show={showSidebar} setter={setShowSidebar} />
-                <div className="flex flex-col flex-grow w-screen md:w-full min-h-screen">
+                <div className="flex flex-col w-full max-w-full min-h-screen justify-start items-center py-20 px-2">
                     {children}
                 </div>
             </div>
