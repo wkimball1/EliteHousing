@@ -4,7 +4,7 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
-export default function Login({
+export default function LoginPage({
   searchParams,
 }: {
   searchParams: { message: string };

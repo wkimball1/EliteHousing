@@ -35,7 +35,7 @@ export default function RootLayout({
           fontSans.variable
         )}
       >
-        <main className="min-h-screen flex flex-col items-center">
+        <main className="min-h-screen flex flex-col">
           <NavBar/>
           {children}
         </main>
