@@ -4,10 +4,8 @@ import Head from 'next/head'
 import Sidebar from '../../../components/Sidebar';
 import MenuBarMobile from '../../../components/MenuBarMobile';
 
-export default function DashboardLayout({ pageTitle, children } : {pageTitle: string, children: React.ReactNode}) {
-    // Concatenate page title (if exists) to site title
-    let titleConcat = "Responsive Sidebar Example";
-    if (pageTitle) titleConcat = pageTitle + " | " + titleConcat;
+export default function DashboardLayout({ children } : {children: React.ReactNode}) {
+
 
     // Mobile sidebar visibility state
     const [showSidebar, setShowSidebar] = useState(false);
