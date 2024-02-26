@@ -35,6 +35,7 @@ const upsertProductRecord = async (product: Stripe.Product) => {
   console.log(`Product inserted/updated: ${product.id}`);
 };
 
+
 const upsertPriceRecord = async (
   price: Stripe.Price,
   retryCount = 0,
