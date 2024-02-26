@@ -9,6 +9,7 @@ import { FaTshirt, FaRedhat } from 'react-icons/fa'
 import { MdOutlineWeb } from "react-icons/md";
 import defaultLogo from '@/img/logo.png';
 import darkLogo from '@/img/logo-white.png';
+import { PersonIcon } from '@radix-ui/react-icons'
 
 
 export default function Sidebar({show, setter} : {show:any, setter:Function}) {
@@ -21,13 +22,29 @@ export default function Sidebar({show, setter} : {show:any, setter:Function}) {
     const appendClass = show ? " ml-0" : " ml-[-250px] md:ml-0";
 
     // Clickable menu items
-    const MenuItem = ({icon, name, route} : { icon:any, name:any, route:any }) => {
+    const MenuItem = ({icon, name, route, extra} : { icon:any, name:any, route:any, extra:any }) => {
         // Highlight menu item based on currently displayed route
         const colorClass = pathname === route ? "text-foreground" : "text-foreground/50 hover:text-foreground";
 
+        if (extra != null ) {
         return (
             <Link
-                href={route}
+                href={{pathname: route, query: {message: extra} }}
+                onClick={() => {
+                    setter((oldVal: any) => !oldVal);
+                }}
+                className={`flex gap-1 [&>*]:my-auto text-md pl-6 py-3 border-b-[1px] border-background/10 ${colorClass}`}
+            >
+                <div className="text-xl flex [&>*]:mx-auto w-[30px]">
+                    {icon}
+                </div>
+                <div>{name}</div>
+            </Link>
+        )} 
+        else {
+        return (
+            <Link
+                href={{pathname: route }}
                 onClick={() => {
                     setter((oldVal: any) => !oldVal);
                 }}
@@ -39,6 +56,7 @@ export default function Sidebar({show, setter} : {show:any, setter:Function}) {
                 <div>{name}</div>
             </Link>
         )
+    }
     }
 
     // Overlay to prevent clicks in background, also serves as our close button
@@ -69,27 +87,62 @@ export default function Sidebar({show, setter} : {show:any, setter:Function}) {
                     <MenuItem
                         name="Home"
                         route="/admin/dashboard"
-                        icon={<SlHome />}
+                        icon={null}
+                        extra={null}
                     />
                     <MenuItem
-                        name="T-Shirts"
-                        route="/t-shirts"
-                        icon={<FaTshirt />}
+                        name="Employees"
+                        route="/admin/dashboard/employees"
+                        icon={null}
+                        extra={null}
                     />
                     <MenuItem
-                        name="Hats"
-                        route="/hats"
-                        icon={<FaRedhat />}
+                        name="Customers"
+                        route="/admin/dashboard/customers"
+                        icon={null}
+                        extra={null}
                     />
                     <MenuItem
-                        name="About Us"
-                        route="/about"
-                        icon={<BsInfoSquare />}
+                        name="Inventory"
+                        route="/admin/dashboard/inventory"
+                        icon={null}
+                        extra={null}
+                    />
+                    <MenuItem
+                        name="Sales"
+                        route="/admin/dashboard/sales"
+                        icon={null}
+                        extra={null}
+                    />
+                    <MenuItem
+                        name="Orders"
+                        route="/admin/dashboard/orders"
+                        icon={null}
+                        extra={null}
+                    />
+                    <MenuItem
+                        name="Pending Jobs"
+                        route="/admin/dashboard/jobs"
+                        icon={null}
+                        extra="pending"
+                    />
+                    <MenuItem
+                        name="Previous Jobs"
+                        route="/admin/dashboard/jobs"
+                        icon={null}
+                        extra="previous"
+                    />
+                    <MenuItem
+                        name="Current Jobs"
+                        route="/admin/dashboard/jobs"
+                        icon={null}
+                        extra="current"
                     />
                     <MenuItem
                         name="Client Website"
                         route="/"
-                        icon={<MdOutlineWeb/>}
+                        icon={null}
+                        extra={null}
                     />
                 </div>
             </div>

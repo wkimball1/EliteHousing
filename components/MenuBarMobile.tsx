@@ -6,7 +6,6 @@ import { FaUser } from 'react-icons/fa'
 import defaultLogo from '@/img/logo.png';
 import darkLogo from '@/img/logo-white.png';
 
-import logo from '@/img/logo.png'
 
 export default function MenuBarMobile( {setter} : {setter:Function} ) {
     return (
@@ -20,9 +19,9 @@ export default function MenuBarMobile( {setter} : {setter:Function} ) {
                 <Icon />
             </button>
             <Link href="/" className="mx-auto">
-                {/*eslint-disable-next-line*/}
+                
                 <img src={defaultLogo.src} alt="Company Logo" width={150} height={150} className="lightLogo"/>
-          <img src={darkLogo.src} alt="Company Logo" width={150} height={150} className="darkLogo"/>
+                <img src={darkLogo.src} alt="Company Logo" width={150} height={150} className="darkLogo"/>
             </Link>
             <Link
                 className="text-3xl flex text-white"
