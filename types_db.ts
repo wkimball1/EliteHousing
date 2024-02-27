@@ -1,4 +1,6 @@
-﻿export type Json =
+﻿import Stripe from 'stripe';
+
+export type Json =
   | string
   | number
   | boolean
@@ -12,24 +14,23 @@ export interface Database {
       customers: {
         Row: {
           id: string
-          stripe_customer_id: string | null
+          billing_address: any | null 
+          email: string | null
+          full_name: string | null
         }
         Insert: {
           id: string
-          stripe_customer_id?: string | null
+          billing_address?: any | null 
+          email?: string | null 
+          full_name?: string | null
         }
         Update: {
           id?: string
-          stripe_customer_id?: string | null
+          billing_address?: any | null 
+          email?: string | null 
+          full_name?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "customers_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
         ]
       }
       prices: {
@@ -119,7 +120,7 @@ export interface Database {
           status: Database["public"]["Enums"]["subscription_status"] | null
           trial_end: string | null
           trial_start: string | null
-          user_id: string
+          customer_id: string
         }
         Insert: {
           cancel_at?: string | null
@@ -136,7 +137,7 @@ export interface Database {
           status?: Database["public"]["Enums"]["subscription_status"] | null
           trial_end?: string | null
           trial_start?: string | null
-          user_id: string
+          customer_id: string
         }
         Update: {
           cancel_at?: string | null
@@ -153,7 +154,7 @@ export interface Database {
           status?: Database["public"]["Enums"]["subscription_status"] | null
           trial_end?: string | null
           trial_start?: string | null
-          user_id?: string
+          customer_id?: string
         }
         Relationships: [
           {
@@ -164,10 +165,10 @@ export interface Database {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "subscriptions_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "subscriptions_customer_id_fkey"
+            columns: ["customer_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "customers"
             referencedColumns: ["id"]
           }
         ]
@@ -175,24 +176,21 @@ export interface Database {
       users: {
         Row: {
           avatar_url: string | null
-          billing_address: Json | null
           full_name: string | null
           id: string
-          payment_method: Json | null
+          work_location: string | null
         }
         Insert: {
           avatar_url?: string | null
-          billing_address?: Json | null
           full_name?: string | null
           id: string
-          payment_method?: Json | null
+          work_location?: string | null
         }
         Update: {
           avatar_url?: string | null
-          billing_address?: Json | null
           full_name?: string | null
-          id?: string
-          payment_method?: Json | null
+          id: string
+          work_location?: string | null
         }
         Relationships: [
           {

@@ -40,7 +40,6 @@ export async function checkoutWithStripe(
     try {
       customer = await createOrRetrieveCustomer({
         uuid: user?.id || '',
-        email: user?.email || ''
       });
     } catch (err) {
       console.error(err);
@@ -119,26 +118,16 @@ export async function checkoutWithStripe(
   }
 }
 
-export async function createStripePortal(currentPath: string) {
+export async function createStripePortal(currentPath: string, customerId: string | null) {
   try {
     const supabase = createClient();
-    const {
-      error,
-      data: { user }
-    } = await supabase.auth.getUser();
 
-    if (!user) {
-      if (error) {
-        console.error(error);
-      }
-      throw new Error('Could not get user session.');
-    }
+
 
     let customer;
     try {
       customer = await createOrRetrieveCustomer({
-        uuid: user.id || '',
-        email: user.email || ''
+        uuid: customerId || '',
       });
     } catch (err) {
       console.error(err);
@@ -152,7 +141,7 @@ export async function createStripePortal(currentPath: string) {
     try {
       const { url } = await stripe.billingPortal.sessions.create({
         customer,
-        return_url: getURL('/account')
+        return_url: getURL('/admin/dashboard')
       });
       if (!url) {
         throw new Error('Could not create billing portal');

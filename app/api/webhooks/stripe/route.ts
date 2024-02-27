@@ -5,10 +5,14 @@ import {
   upsertPriceRecord,
   manageSubscriptionStatusChange,
   deleteProductRecord,
-  deletePriceRecord
+  deletePriceRecord,
+  upsertCustomer,
 } from '@/utils/supabase/admin';
 
 const relevantEvents = new Set([
+  'customer.created',
+  'customer.updated',
+  'customer.deleted',
   'product.created',
   'product.updated',
   'product.deleted',
@@ -40,6 +44,10 @@ export async function POST(req: Request) {
   if (relevantEvents.has(event.type)) {
     try {
       switch (event.type) {
+        case 'customer.created':
+        case 'customer.updated':
+        await upsertCustomer(event.data.object as Stripe.Customer);
+        break;
         case 'product.created':
         case 'product.updated':
           await upsertProductRecord(event.data.object as Stripe.Product);
