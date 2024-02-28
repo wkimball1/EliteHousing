@@ -171,9 +171,9 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
               <CardFooter></CardFooter>
             </Card>
           </div>
-          <div className="w-full">
+          <div className="w-full pt-6">
             <Tabs defaultValue="invoices" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-2 bg-stone-100 dark:bg-stone-900">
                 <TabsTrigger value="invoices">Invoices</TabsTrigger>
                 <TabsTrigger value="quotes">Quotes</TabsTrigger>
               </TabsList>
@@ -187,7 +187,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                   <></>
                 )}
               </TabsContent>
-              <TabsContent value="password">
+              <TabsContent value="quotes">
                 <Card>
                   <CardHeader>
                     <CardTitle>Password</CardTitle>
