@@ -80,7 +80,7 @@ export function DataTableInvoices<TData, TValue>({
   });
 
   return (
-    <div className="w-full">
+    <div className="w-full max-w-sm md:max-w-full">
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter status..."

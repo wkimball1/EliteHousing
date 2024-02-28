@@ -89,8 +89,8 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
     );
   } else {
     return (
-      <div className="flex w-full flex-wrap max-w-full min-h-screen justify-center items-start px-2 py-5">
-        <div className="flex-auto w-40 flex-col basis-1/4 leading-tight tracking-tighter lg:leading-[1.1]">
+      <div className="flex w-full flex-wrap max-w-full justify-center items-start px-2 py-5">
+        <div className="flex-auto w-40 flex-col md:basis-1/4 leading-tight tracking-tighter lg:leading-[1.1]">
           <h1 className="text-lg font-bold md:text-3xl ">
             {!!customer[0] && !!customer[0].full_name
               ? customer[0].full_name
@@ -129,22 +129,22 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
             </div>
           </div>
         </div>
-        <div className="flex-col basis-3/4 pt-6">
-          <div className="flex flex-row gap-4 flex-wrap h-fit justify-center">
-            <Card className="w-32 md:w-32 lg:w-60  bg-background ">
+        <div className="flex flex-col md:basis-3/4 pt-6 w-full max-w-sm md:max-w-full">
+          <div className="flex flex-row gap-4 justify-center items-center">
+            <Card className="w-25 h-25 md:w-32 lg:w-60  md:h-fit bg-background ">
               <CardHeader className="items-center text-sm md:text-xl">
                 <CardTitle>Balance</CardTitle>
               </CardHeader>
-              <CardContent className="grid gap-4 items-center justify-center">
+              <CardContent className="grid gap-2 items-center justify-center">
                 <p className="text-xs md:text-xl">
                   {!!stripeCustomer && !!stripeCustomer.balance
                     ? balanceFormat(stripeCustomer!.balance)
-                    : ""}
+                    : balanceFormat("0")}
                 </p>
               </CardContent>
               <CardFooter></CardFooter>
             </Card>
-            <Card className="w-32 md:w-32 lg:w-60  h-fit bg-background">
+            <Card className="w-25 h-25 md:w-32 lg:w-60 md:h-fit bg-background">
               <CardHeader className="items-center text-sm md:text-xl">
                 <CardTitle>Balance</CardTitle>
               </CardHeader>
@@ -152,12 +152,12 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                 <p className="text-xs md:text-xl">
                   {!!stripeCustomer && !!stripeCustomer.balance
                     ? balanceFormat(stripeCustomer!.balance)
-                    : ""}
+                    : balanceFormat("0")}
                 </p>
               </CardContent>
               <CardFooter></CardFooter>
             </Card>
-            <Card className="w-32 md:w-32 lg:w-60  h-fit bg-background">
+            <Card className="w-25 h-25 md:w-32 lg:w-60  md:h-fit bg-background">
               <CardHeader className="items-center text-sm md:text-xl">
                 <CardTitle>Balance</CardTitle>
               </CardHeader>
@@ -165,13 +165,13 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                 <p className="text-xs md:text-xl">
                   {!!stripeCustomer && !!stripeCustomer.balance
                     ? balanceFormat(stripeCustomer!.balance)
-                    : ""}
+                    : balanceFormat("0")}
                 </p>
               </CardContent>
               <CardFooter></CardFooter>
             </Card>
           </div>
-          <div>
+          <div className="w-full">
             <Tabs defaultValue="invoices" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="invoices">Invoices</TabsTrigger>
