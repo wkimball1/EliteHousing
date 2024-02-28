@@ -24,17 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DataTableInvoices } from "../data-table-invoice";
 import { columns } from "../columns-invoice";
-
-export function balanceFormat(amount: string) {
-  const balance = parseFloat(amount);
-
-  // Format the amount as a dollar amount
-  const formatted = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(balance);
-  return formatted;
-}
+import balanceFormat from "@/components/balanceFormat";
 
 export default function CustomerPage({ params }: { params: { id: string } }) {
   const [isLoading, setIsLoading] = useState(true);

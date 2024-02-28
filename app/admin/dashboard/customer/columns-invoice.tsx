@@ -39,7 +39,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Stripe from "stripe";
-import { balanceFormat } from "./[id]/page";
+import balanceFormat from "@/components/balanceFormat";
 
 const TimestampConverter = (timestamp: any) => {
   // Convert Unix timestamp to milliseconds
