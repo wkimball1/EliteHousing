@@ -163,10 +163,7 @@ export const columns: ColumnDef<Customer>[] = [
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() =>
-                router.push(
-                  "/admin/dashboard/customer?" +
-                    createQueryString("customerId", customer.id)
-                )
+                router.push("/admin/dashboard/customer/" + customer.id)
               }
             >
               View customer details

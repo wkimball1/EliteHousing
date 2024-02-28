@@ -39,6 +39,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Stripe from "stripe";
+import { balanceFormat } from "./[id]/page";
 
 const TimestampConverter = (timestamp: any) => {
   // Convert Unix timestamp to milliseconds
@@ -53,6 +54,24 @@ const TimestampConverter = (timestamp: any) => {
   // Construct the formatted string
   return `${month} ${day}`;
 };
+
+const getColorClass = (status: string) => {
+  switch (status) {
+    case "draft":
+      return "bg-slate-200";
+    case "open":
+      return "bg-slate-50";
+    case "paid":
+      return "bg-green-500";
+    case "uncollectable":
+      return "bg-red-400";
+    case "void":
+      return "bg-stone-400";
+    default:
+      return "bg-background";
+  }
+};
+
 export const columns: ColumnDef<any>[] = [
   {
     id: "select",
@@ -80,15 +99,26 @@ export const columns: ColumnDef<any>[] = [
     accessorKey: "amount_due",
     header: "Amount",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("amount_due")}</div>
+      <div className="capitalize">
+        {balanceFormat(row.getValue("amount_due"))}
+      </div>
     ),
   },
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("status")}</div>
-    ),
+    cell: ({ row }) => {
+      return (
+        <div>
+          <Button
+            variant="outline"
+            className={`capitalize ${getColorClass(row.getValue("status"))}`}
+          >
+            {row.getValue("status")}
+          </Button>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "id",
@@ -110,7 +140,7 @@ export const columns: ColumnDef<any>[] = [
       );
     },
     cell: ({ row }) => (
-      <div className="lowercase">
+      <div className="capitalize">
         {!!row.getValue("due_date")
           ? TimestampConverter(row.getValue("due_date"))
           : "none"}

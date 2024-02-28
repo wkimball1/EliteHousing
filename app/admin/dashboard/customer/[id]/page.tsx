@@ -22,12 +22,23 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { DataTableInvoices } from "./data-table-invoice";
-import { columns } from "./columns-invoice";
-export default function CustomerPage() {
-  const searchParams = useSearchParams();
+import { DataTableInvoices } from "../data-table-invoice";
+import { columns } from "../columns-invoice";
+
+export function balanceFormat(amount: string) {
+  const balance = parseFloat(amount);
+
+  // Format the amount as a dollar amount
+  const formatted = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(balance);
+  return formatted;
+}
+
+export default function CustomerPage({ params }: { params: { id: string } }) {
   const [isLoading, setIsLoading] = useState(true);
-  const [customer, setCustomer] = useState<any[] | null>([]);
+  const [customer, setCustomer] = useState<any[] | null>(null);
   const [stripeCustomer, setStripeCustomer] = useState<any | null>(null);
   const [stripeInvoices, setStripeInvoices] = useState<any | null>(null);
   const supabase = createClient();
@@ -35,7 +46,8 @@ export default function CustomerPage() {
   useEffect(() => {
     (async () => {
       setIsLoading(true);
-      const custId = searchParams.get("customerId");
+      const custId = params.id;
+      console.log(params);
       try {
         const { data: customer, error } = await supabase
           .from("customers")
@@ -57,15 +69,26 @@ export default function CustomerPage() {
     })();
   }, []);
 
-  const balanceFormat = (amount: string) => {
-    const balance = parseFloat(amount);
+  const addressFormat = (address: any) => {
+    const billingAddress = address; // Access the original data
 
-    // Format the amount as a dollar amount
-    const formatted = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(balance);
-    return formatted;
+    // Access the "line1" property from the billing address object
+    const line1 =
+      billingAddress && billingAddress.line1 ? billingAddress.line1 : "N/A";
+    const state =
+      billingAddress && billingAddress.state ? billingAddress.state : "";
+    const city =
+      billingAddress && billingAddress.city ? billingAddress.city : "";
+    const zip =
+      billingAddress && billingAddress.postal_code
+        ? billingAddress.postal_code
+        : "";
+
+    // Combine line1 and city, separating them with a comma and space
+    const combinedAddress = `${line1}${line1 && city ? ", " : ""}${city}${
+      city && state ? ", " : ""
+    }${state}${(line1 || city || state) && zip ? " " : ""}${zip}`;
+    return combinedAddress;
   };
 
   if (!customer || isLoading) {
@@ -79,14 +102,16 @@ export default function CustomerPage() {
       <div className="flex w-full flex-wrap max-w-full min-h-screen justify-center items-start px-2 py-5">
         <div className="flex-auto w-40 flex-col basis-1/4 leading-tight tracking-tighter lg:leading-[1.1]">
           <h1 className="text-lg font-bold md:text-3xl ">
-            {customer![0].full_name}
+            {!!customer[0] && !!customer[0].full_name
+              ? customer[0].full_name
+              : " "}
           </h1>
           <div className="items-start justify-start pt-10">
             <div className="items-start justify-start text-md font-bold">
               <h2>Customer ID</h2>
             </div>
             <div className="items-start justify-start pt-2 text-sm">
-              {!!customer![0].id ? (
+              {!!customer[0] && !!customer[0].id ? (
                 <h2>{customer![0].id}</h2>
               ) : (
                 <h2>No ID found</h2>
@@ -96,7 +121,7 @@ export default function CustomerPage() {
               <h2>Email</h2>
             </div>
             <div className="items-start justify-start pt-2 text-sm">
-              {!!customer![0].email ? (
+              {!!customer[0] && !!customer![0].email ? (
                 <h2>{customer![0].email}</h2>
               ) : (
                 <h2>No email found</h2>
@@ -106,12 +131,11 @@ export default function CustomerPage() {
               <h2>Address</h2>
             </div>
             <div className="items-start justify-start py-2 text-sm">
-              {!!customer![0].billing_address ? (
-                <h2>{customer![0].billing_address}</h2>
+              {!!customer[0] && !!customer![0].billing_address ? (
+                <h2>{addressFormat(customer![0].billing_address)}</h2>
               ) : (
                 <h2>No address found</h2>
               )}
-              <h2>{customer![0].billing_address}</h2>
             </div>
           </div>
         </div>
@@ -123,7 +147,9 @@ export default function CustomerPage() {
               </CardHeader>
               <CardContent className="grid gap-4 items-center justify-center">
                 <p className="text-xs md:text-xl">
-                  {balanceFormat(stripeCustomer!.balance)}
+                  {!!stripeCustomer && !!stripeCustomer.balance
+                    ? balanceFormat(stripeCustomer!.balance)
+                    : ""}
                 </p>
               </CardContent>
               <CardFooter></CardFooter>
@@ -134,7 +160,9 @@ export default function CustomerPage() {
               </CardHeader>
               <CardContent className="grid gap-4 items-center justify-center">
                 <p className="text-xs md:text-xl">
-                  {balanceFormat(stripeCustomer!.balance)}
+                  {!!stripeCustomer && !!stripeCustomer.balance
+                    ? balanceFormat(stripeCustomer!.balance)
+                    : ""}
                 </p>
               </CardContent>
               <CardFooter></CardFooter>
@@ -145,7 +173,9 @@ export default function CustomerPage() {
               </CardHeader>
               <CardContent className="grid gap-4 items-center justify-center">
                 <p className="text-xs md:text-xl">
-                  {balanceFormat(stripeCustomer!.balance)}
+                  {!!stripeCustomer && !!stripeCustomer.balance
+                    ? balanceFormat(stripeCustomer!.balance)
+                    : ""}
                 </p>
               </CardContent>
               <CardFooter></CardFooter>
@@ -158,10 +188,14 @@ export default function CustomerPage() {
                 <TabsTrigger value="quotes">Quotes</TabsTrigger>
               </TabsList>
               <TabsContent value="invoices">
-                <DataTableInvoices
-                  columns={columns}
-                  data={[...stripeInvoices]}
-                />
+                {!!stripeInvoices ? (
+                  <DataTableInvoices
+                    columns={columns}
+                    data={[...stripeInvoices]}
+                  />
+                ) : (
+                  <></>
+                )}
               </TabsContent>
               <TabsContent value="password">
                 <Card>
