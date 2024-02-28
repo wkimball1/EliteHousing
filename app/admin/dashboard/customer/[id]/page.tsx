@@ -91,7 +91,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
     return (
       <div className="flex w-full flex-wrap max-w-full justify-center items-start px-2 py-5">
         <div className="flex-auto w-40 flex-col md:basis-1/4 leading-tight tracking-tighter lg:leading-[1.1]">
-          <h1 className="text-lg font-bold md:text-3xl dark:text-stone-300">
+          <h1 className="text-2xl font-bold md:text-3xl dark:text-stone-300 pt-2">
             {!!customer[0] && !!customer[0].full_name
               ? customer[0].full_name
               : " "}
