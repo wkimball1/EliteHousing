@@ -38,10 +38,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Stripe from "stripe";
 
-type Customer = Tables<"customers">;
+const TimestampConverter = (timestamp: any) => {
+  // Convert Unix timestamp to milliseconds
+  const date = new Date(timestamp * 1000);
 
-export const columns: ColumnDef<Customer>[] = [
+  // Get month and day
+  const month = new Intl.DateTimeFormat("en-US", { month: "long" }).format(
+    date
+  );
+  const day = date.getDate();
+
+  // Construct the formatted string
+  return `${month} ${day}`;
+};
+export const columns: ColumnDef<any>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -65,12 +77,26 @@ export const columns: ColumnDef<Customer>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "id",
-    header: "Id",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
+    accessorKey: "amount_due",
+    header: "Amount",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("amount_due")}</div>
+    ),
   },
   {
-    accessorKey: "full_name",
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("status")}</div>
+    ),
+  },
+  {
+    accessorKey: "id",
+    header: "Invoice Number",
+    cell: ({ row }) => <div>{row.getValue("id")}</div>,
+  },
+  {
+    accessorKey: "due_date",
     header: ({ column }) => {
       return (
         <Button
@@ -78,55 +104,25 @@ export const columns: ColumnDef<Customer>[] = [
           className="pl-0"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Name
+          Due Date
           <CaretSortIcon className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("full_name")}</div>
+      <div className="lowercase">
+        {!!row.getValue("due_date")
+          ? TimestampConverter(row.getValue("due_date"))
+          : "none"}
+      </div>
     ),
   },
   {
-    accessorKey: "email",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          className="pl-0"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Email
-          <CaretSortIcon className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
-  },
-  {
     accessorKey: "billing_address",
-    header: () => <div>Address</div>,
-    cell: ({ row }) => {
-      const billingAddress = row.original.billing_address; // Access the original data
-
-      // Access the "line1" property from the billing address object
-      const line1 =
-        billingAddress && billingAddress.line1 ? billingAddress.line1 : "N/A";
-      const state =
-        billingAddress && billingAddress.state ? billingAddress.state : "";
-      const city =
-        billingAddress && billingAddress.city ? billingAddress.city : "";
-      const zip =
-        billingAddress && billingAddress.postal_code
-          ? billingAddress.postal_code
-          : "";
-
-      // Combine line1 and city, separating them with a comma and space
-      const combinedAddress = `${line1}${line1 && city ? ", " : ""}${city}${
-        city && state ? ", " : ""
-      }${state}${(line1 || city || state) && zip ? " " : ""}${zip}`;
-      return <div className="capitalize">{combinedAddress}</div>;
-    },
+    header: () => <div className="text-right">Address</div>,
+    cell: ({ row }) => (
+      <div className="lowercase">{row.getValue("billing_address")}</div>
+    ),
   },
   {
     id: "actions",
@@ -148,7 +144,7 @@ export const columns: ColumnDef<Customer>[] = [
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
+            <Button variant="default" className="h-8 w-8 p-0">
               <span className="sr-only">Open menu</span>
               <DotsHorizontalIcon className="h-4 w-4" />
             </Button>

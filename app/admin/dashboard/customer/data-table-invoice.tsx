@@ -48,7 +48,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
 }
 
-export function DataTableCustomers<TData, TValue>({
+export function DataTableInvoices<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
@@ -83,10 +83,10 @@ export function DataTableCustomers<TData, TValue>({
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter status..."
+          value={(table.getColumn("status")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("status")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -96,7 +96,7 @@ export function DataTableCustomers<TData, TValue>({
               Columns <ChevronDownIcon className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="bg-background">
             {table
               .getAllColumns()
               .filter((column) => column.getCanHide())

@@ -207,6 +207,7 @@ const createOrRetrieveCustomer = async ({
   }
 };
 
+
 /**
  * Copies the billing details from the payment method to the customer object.
  */

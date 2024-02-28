@@ -117,6 +117,48 @@ export async function checkoutWithStripe(
     }
   }
 }
+export async function retrieveCustomer({
+  // customerId,
+  id
+}: {
+  // customerID: string;
+  id: string;
+}){
+
+
+  const existingStripeCustomer = await stripe.customers.retrieve(
+    id
+  );
+
+  if (!!existingStripeCustomer) {
+    return JSON.parse(JSON.stringify(existingStripeCustomer));
+  }
+  return {error: "customer not found"}
+
+
+};
+
+export async function retrieveCustomerInvoices({
+  // customerId,
+  id
+}: {
+  // customerID: string;
+  id: string;
+}){
+
+
+  const {data: stripeCustomerInvoices
+  } = await stripe.invoices.list(
+    {customer: id}
+  );
+
+  if (!!stripeCustomerInvoices) {
+    return JSON.parse(JSON.stringify(stripeCustomerInvoices));
+  }
+  return {error: "invoices not found"}
+
+
+};
 
 export async function createStripePortal(currentPath: string, customerId: string | null) {
   try {

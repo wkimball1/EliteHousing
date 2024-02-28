@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import Button from '@/components/ui/Button';
-import { useRouter, usePathname } from 'next/navigation';
-import { useState } from 'react';
-import { createStripePortal } from '@/utils/stripe/server';
-import Link from 'next/link';
-import Card from '@/components/ui/Card';
-import { Tables } from '@/types_db';
+import Button from "@/components/ui/ButtonMain";
+import { useRouter, usePathname } from "next/navigation";
+import { useState } from "react";
+import { createStripePortal } from "@/utils/stripe/server";
+import Link from "next/link";
+import Card from "@/components/ui/CardOther";
+import { Tables } from "@/types_db";
 
-type Subscription = Tables<'subscriptions'>;
-type Price = Tables<'prices'>;
-type Product = Tables<'products'>;
+type Subscription = Tables<"subscriptions">;
+type Price = Tables<"prices">;
+type Product = Tables<"products">;
 
 type SubscriptionWithPriceAndProduct = Subscription & {
   prices:
@@ -22,20 +22,23 @@ type SubscriptionWithPriceAndProduct = Subscription & {
 
 interface Props {
   subscription: SubscriptionWithPriceAndProduct | null;
-  customerId: string | null
+  customerId: string | null;
 }
 
-export default function CustomerPortalForm({ subscription, customerId }: Props) {
+export default function CustomerPortalForm({
+  subscription,
+  customerId,
+}: Props) {
   const router = useRouter();
   const currentPath = usePathname();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const subscriptionPrice =
     subscription &&
-    new Intl.NumberFormat('en-US', {
-      style: 'currency',
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
       currency: subscription?.prices?.currency!,
-      minimumFractionDigits: 0
+      minimumFractionDigits: 0,
     }).format((subscription?.prices?.unit_amount || 0) / 100);
 
   const handleStripePortalRequest = async () => {
@@ -51,7 +54,7 @@ export default function CustomerPortalForm({ subscription, customerId }: Props) 
       description={
         subscription
           ? `You are currently on the ${subscription?.prices?.products?.name} plan.`
-          : 'You are not currently subscribed to any plan.'
+          : "You are not currently subscribed to any plan."
       }
       footer={
         <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center">
