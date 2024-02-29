@@ -40,6 +40,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Stripe from "stripe";
 import balanceFormat from "@/components/balanceFormat";
+import Link from "next/link";
+import InvoiceDialog from "./[id]/InvoiceDialog";
+import { Dialog } from "@/components/ui/dialog";
 
 const TimestampConverter = (timestamp: any) => {
   // Convert Unix timestamp to milliseconds
@@ -147,58 +150,68 @@ export const columns: ColumnDef<any>[] = [
       </div>
     ),
   },
-  {
-    accessorKey: "billing_address",
-    header: () => <div className="text-right">Address</div>,
-    cell: ({ row }) => (
-      <div className="lowercase">{row.getValue("billing_address")}</div>
-    ),
-  },
+
   {
     id: "actions",
     enableHiding: false,
+    header: "Actions",
     cell: ({ row }) => {
-      const customer = row.original;
+      const invoice = row.original;
       const router = useRouter();
-      const searchParams = useSearchParams();
-
-      const createQueryString = useCallback(
-        (name: string, value: string) => {
-          const params = new URLSearchParams(searchParams.toString());
-          params.set(name, value);
-
-          return params.toString();
-        },
-        [searchParams]
-      );
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="default" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <DotsHorizontalIcon className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-background">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(customer.id)}
+        <Dialog>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="default" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <DotsHorizontalIcon className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              className="bg-background flex flex-col items-center text-sm"
             >
-              Copy customer ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() =>
-                router.push(
-                  "/admin/dashboard/customer?" +
-                    createQueryString("customerId", customer.id)
-                )
-              }
-            >
-              View customer details
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              <InvoiceDialog invoice={invoice} />
+              <Link
+                href={
+                  !!invoice && !!invoice.invoice_pdf ? invoice.invoice_pdf : ""
+                }
+                rel="noopener noreferrer"
+                target="_blank"
+                className={
+                  !!invoice && !!invoice.invoice_pdf
+                    ? " "
+                    : "pointer-events-none"
+                }
+                aria-disabled={!invoice || !invoice.invoice_pdf}
+                tabIndex={!invoice || !invoice.invoice_pdf ? -1 : undefined}
+              >
+                View Invoice
+              </Link>
+              <DropdownMenuSeparator />
+              <Link
+                href={
+                  !!invoice && !!invoice.hosted_invoice_url
+                    ? invoice.hosted_invoice_url
+                    : ""
+                }
+                rel="noopener noreferrer"
+                target="_blank"
+                className={
+                  !!invoice && !!invoice.hosted_invoice_url
+                    ? " "
+                    : "pointer-events-none"
+                }
+                aria-disabled={!invoice || !invoice.hosted_invoice_url}
+                tabIndex={
+                  !invoice || !invoice.hosted_invoice_url ? -1 : undefined
+                }
+              >
+                Pay Invoice
+              </Link>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </Dialog>
       );
     },
   },

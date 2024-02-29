@@ -176,18 +176,22 @@ export interface Database {
       users: {
         Row: {
           avatar_url: string | null
+          email: string | null
           full_name: string | null
           id: string
           work_location: string | null
+          
         }
         Insert: {
           avatar_url?: string | null
+          email?: string | null
           full_name?: string | null
           id: string
           work_location?: string | null
         }
         Update: {
           avatar_url?: string | null
+          email?: string | null
           full_name?: string | null
           id: string
           work_location?: string | null

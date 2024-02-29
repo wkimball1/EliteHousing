@@ -43,15 +43,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-interface DataTableCustomerProps<TData, TValue> {
+interface DataTableEmployeeProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export function DataTableCustomers<TData, TValue>({
+export function DataTableEmployees<TData, TValue>({
   columns,
   data,
-}: DataTableCustomerProps<TData, TValue>) {
+}: DataTableEmployeeProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
