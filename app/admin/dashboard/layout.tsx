@@ -13,13 +13,11 @@ export default function DashboardLayout({
   const [showSidebar, setShowSidebar] = useState(false);
 
   return (
-    <div className="min-h-screen">
-      <div className="flex min-h-screen">
-        <MenuBarMobile setter={setShowSidebar} />
-        <Sidebar show={showSidebar} setter={setShowSidebar} />
-        <div className="flex flex-col w-full max-w-full min-h-screen justify-start items-center py-16 md:py-4 px-2">
-          {children}
-        </div>
+    <div className="flex w-full max-w-full min-h-screen">
+      <MenuBarMobile setter={setShowSidebar} />
+      <Sidebar show={showSidebar} setter={setShowSidebar} />
+      <div className="flex flex-col w-full max-w-full justify-start items-center py-16 md:py-4 px-2">
+        {children}
       </div>
     </div>
   );

@@ -95,11 +95,13 @@ export function DataTableEmployees<TData, TValue>({
         />
         <span className="px-4"></span>
         <Input
-          id="filterEmails"
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          id="filterWork"
+          placeholder="Filter location..."
+          value={
+            (table.getColumn("work_location")?.getFilterValue() as string) ?? ""
+          }
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("work_location")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

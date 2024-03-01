@@ -1,12 +1,11 @@
 import { GeistSans } from "geist/font/sans";
 import "./globals.css";
-import NavBar from "@/components/NavBar";
 import { Inter as FontSans } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import { Toaster } from "@/components/ui/toaster";
 
 import { cn } from "../lib/utils";
-import AuthButton from "@/components/AuthButton";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -19,7 +18,7 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Home Renovation Services",
+  title: "Home Renovation Systems",
   description: "Your home renovation experts",
 };
 
@@ -42,8 +41,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <main className="min-h-screen flex flex-col">{children}</main>
+          <main className="min-h-screen w-full max-w-full flex flex-col">
+            {children}
+          </main>
         </ThemeProvider>
+        <Toaster />
         <SpeedInsights />
       </body>
     </html>

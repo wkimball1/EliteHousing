@@ -25,7 +25,7 @@
     --ring: 240 5.9% 10%;
     --radius: 0.5rem;
   }
- 
+
   .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
@@ -48,30 +48,29 @@
     --ring: 240 4.9% 83.9%;
   }
 }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --background: 200 50% 3%;
-      --btn-background: 200 10% 9%;
-      --btn-background-hover: 200 10% 12%;
-      --foreground: 200 20% 96%;
-    }
-    .lightLogo {
-      display: none
-    }
-    .darkLogo {
-      display: block
-    }
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: 200 50% 3%;
+    --btn-background: 200 10% 9%;
+    --btn-background-hover: 200 10% 12%;
+    --foreground: 200 20% 96%;
   }
-
-  @media (prefers-color-scheme: light) {
-    .darkLogo {
-      display: none
-    }
-    .lightLogo {
-      display: block
-    }
+  .lightLogo {
+    display: none;
   }
+  .darkLogo {
+    display: block;
+  }
+}
 
+@media (prefers-color-scheme: light) {
+  .darkLogo {
+    display: none;
+  }
+  .lightLogo {
+    display: block;
+  }
+}
 
 @layer base {
   * {
@@ -93,4 +92,3 @@
     transform: translateY(0);
   }
 }
-

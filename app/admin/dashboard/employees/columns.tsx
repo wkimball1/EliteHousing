@@ -105,7 +105,7 @@ export const columns: ColumnDef<Employee>[] = [
   },
   {
     accessorKey: "work_location",
-    header: "Work Location",
+    header: () => <div>Location</div>,
     cell: ({ row }) => {
       return <div className="capitalize">{row.getValue("work_location")}</div>;
     },
