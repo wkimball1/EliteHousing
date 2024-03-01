@@ -11,7 +11,7 @@ export default function ClientLayout({
   return (
     <div className="flex flex-col min-h-screen">
       <NavBar />
-      <div className="flex w-full max-w-full flex-1 py-16 md:py-4 px-2">
+      <div className="flex w-full max-w-full flex-1 pt-16 pb-4 md:py-4 px-2">
         {children}
       </div>
     </div>

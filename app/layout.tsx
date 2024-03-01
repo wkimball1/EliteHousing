@@ -45,7 +45,6 @@ export default function RootLayout({
           <main className="min-h-screen w-full max-w-full flex flex-col">
             {children}
           </main>
-
           <Toaster />
         </ThemeProvider>
         <SpeedInsights />

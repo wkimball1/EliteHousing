@@ -10,7 +10,7 @@ export default function NavBar() {
   const [navBar, setNavBar] = useState(false);
 
   return (
-    <div className="w-full max-w-full px-4 py-2">
+    <div className="w-full max-w-full py-2">
       {/* desktop */}
       <nav className="hidden sticky top-0 z-10 lg:block w-full max-w-full px-4 py-2 text-foreground bg-background border rounded-none shadow-md h-max border-background/80 bg-opacity-80 backdrop-blur-2xl backdrop-saturate-200 lg:px-8 lg:py-4">
         <div className="flex items-center justify-between text-foreground">
