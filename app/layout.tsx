@@ -4,6 +4,7 @@ import { Inter as FontSans } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
+import { Analytics } from "@vercel/analytics/react";
 
 import { cn } from "../lib/utils";
 
@@ -48,6 +49,7 @@ export default function RootLayout({
           <Toaster />
         </ThemeProvider>
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
