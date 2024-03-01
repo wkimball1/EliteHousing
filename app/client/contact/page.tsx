@@ -41,7 +41,9 @@ export default function ContactPage() {
               Full Name*
             </label>
             <input
+              id="name"
               type="text"
+              autoComplete="name"
               placeholder="Full Name"
               className="w-full rounded-md border border-gray-300 bg-background py-3 px-6 text-base font-medium text-primary-foreground outline-none focus:border-blue-500 focus:shadow-md"
               {...register("name", { required: true })}
@@ -55,7 +57,9 @@ export default function ContactPage() {
               Email Address*
             </label>
             <input
+              id="email"
               type="email"
+              autoComplete="email"
               placeholder="example@domain.com"
               className="w-full rounded-md border border-gray-300 bg-background py-3 px-6 text-base font-medium text-primary-foreground outline-none focus:border-blue-500 focus:shadow-md"
               {...register("email", { required: true })}
@@ -69,6 +73,7 @@ export default function ContactPage() {
               Message*
             </label>
             <textarea
+              id="message"
               rows={4}
               placeholder="What services are you looking for?"
               className="w-full resize-none rounded-md border border-gray-300 bg-background py-3 px-6 text-base font-medium text-primary-foreground outline-none focus:border-purple-500 focus:shadow-md"
