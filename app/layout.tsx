@@ -28,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={GeistSans.className}>
+    <html lang="en" className={GeistSans.className} suppressHydrationWarning>
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
@@ -44,8 +44,9 @@ export default function RootLayout({
           <main className="min-h-screen w-full max-w-full flex flex-col">
             {children}
           </main>
+
+          <Toaster />
         </ThemeProvider>
-        <Toaster />
         <SpeedInsights />
       </body>
     </html>
