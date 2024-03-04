@@ -1,22 +1,19 @@
-"use client";
+"use server";
 import React, { useState, useEffect } from "react";
 
-import { redirect, usePathname } from "next/navigation";
 import { createStripePortal } from "@/utils/stripe/server";
+import { redirect } from "next/navigation";
 
-export default function handleStripePortalRequest(customerId: string) {
-  const currentPath = usePathname();
-  const [returnUrl, setRedirectUrl] = useState([]);
-  useEffect(() => {
-    (async () => {
-      try {
-        // await async "fetchBooks()" function
-        const redirectUrl = await createStripePortal(currentPath, customerId);
-        redirect(redirectUrl);
-      } catch (err) {
-        console.log("Error occured when fetching books");
-      }
-    })();
-  }, []);
-  return <></>
+export default async function handleStripePortalRequest(
+  customerId: string,
+  pathname: string
+) {
+  const currentPath = pathname;
+
+  const redirectUrl = await createStripePortal(currentPath, customerId);
+  if (!!redirectUrl) {
+    redirect(`${redirectUrl}`);
+  } else {
+    return alert("failed");
+  }
 }

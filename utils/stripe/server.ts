@@ -159,31 +159,35 @@ export async function retrieveCustomerInvoices({
 
 
 };
+export async function createCustomerInvoice({
+  // customerId,
+  customer
+}: {
+  // customerID: string;
+  customer: any}
+){
+
+
+  const invoice = await stripe.invoices.create(
+    {customer}
+  );
+
+  if (!!invoice) {
+    return JSON.parse(JSON.stringify(invoice));
+  }
+  return {error: "invoice not created"}
+
+
+};
 
 export async function createStripePortal(currentPath: string, customerId: string | null) {
   try {
-    const supabase = createClient();
 
-
-
-    let customer;
-    try {
-      customer = await createOrRetrieveCustomer({
-        uuid: customerId || '',
-      });
-    } catch (err) {
-      console.error(err);
-      throw new Error('Unable to access customer record.');
-    }
-
-    if (!customer) {
-      throw new Error('Could not get customer.');
-    }
 
     try {
       const { url } = await stripe.billingPortal.sessions.create({
-        customer,
-        return_url: getURL('/admin/dashboard')
+        customer: customerId!,
+        return_url: getURL(currentPath)
       });
       if (!url) {
         throw new Error('Could not create billing portal');
