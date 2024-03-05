@@ -265,7 +265,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                     Create new job
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-h-full sm:max-h-[600px] md:max-h-[800px] sm:max-w-[425px] md:max-w-[600px]  overflow-y-auto">
+                <DialogContent className="max-h-[500px] sm:max-h-[600px] md:max-h-[800px] sm:max-w-[425px] md:max-w-[600px]  overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>Create new job</DialogTitle>
                     <DialogDescription>
