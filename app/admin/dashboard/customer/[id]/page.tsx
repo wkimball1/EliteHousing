@@ -14,6 +14,8 @@ import { Check, ChevronsUpDown } from "lucide-react";
 import LoadingDots from "@/components/ui/LoadingDots";
 import { stripe } from "@/utils/stripe/config";
 import {
+  createCustomerInvoice,
+  createCustomerLineItem,
   retrieveCustomer,
   retrieveCustomerInvoices,
 } from "@/utils/stripe/server";
@@ -84,6 +86,7 @@ interface TableRow {
   price: number;
   quantity: number;
   open: boolean;
+  price_id: string;
 }
 
 export default function CustomerPage({ params }: { params: { id: string } }) {
@@ -94,6 +97,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
   const [stripeCustomer, setStripeCustomer] = useState<any | null>(null);
   const [stripeInvoices, setStripeInvoices] = useState<any | null>(null);
   const [value, setValue] = useState("");
+  const [total, setTotal] = useState(0);
   const [billing, setBilling] = useState<any | null>({
     line1: "",
     line2: "",
@@ -121,6 +125,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
       price: 0,
       quantity: 1,
       open: false,
+      price_id: "",
     },
   ]);
 
@@ -134,6 +139,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
         price: 0,
         quantity: 1,
         open: false,
+        price_id: "",
       },
     ]);
   };
@@ -148,8 +154,6 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
     customer: "",
     description: "",
     metadata: { job_id: "" },
-    total: 0,
-    amount_due: 0,
   });
 
   const supabase = createClient();
@@ -210,8 +214,14 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
     newJob.employee = invoiceData.metadata.employee;
     newJob.address = billing;
     console.log(newJob);
+    const invoiceId = await createCustomerInvoice(invoiceData);
+    const InvoiceItem = await createCustomerLineItem(
+      invoiceId,
+      tableData,
+      supabaseCustomer![0]
+    );
+    newJob.invoice_id = invoiceId;
     const jobs = await supabaseServer(newJob);
-    console.log(jobs);
   };
 
   const handleChange = (e: { target: { name: any; value: any } }) => {
@@ -223,21 +233,25 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
     });
   };
 
-  const calculateTotal = () => {
+  useEffect(() => {
+    // Calculate the new total whenever tableData changes
     const newTotal = tableData.map((item) => {
-      return item.price * item.quantity;
+      // Check if both item.price and item.quantity are not NaN
+      if (!isNaN(item.price) && !isNaN(item.quantity)) {
+        return item.price * item.quantity;
+      } else {
+        // If either price or quantity is NaN, return 0
+        return 0;
+      }
     });
-    const totalSum = newTotal.reduce((accumulator, currentValue) => {
-      return accumulator + currentValue;
-    }, 0);
-    console.log(totalSum);
-    setNewInvoice({
-      ...invoiceData,
-      amount_due: totalSum,
-      total: totalSum,
-    });
-    return totalSum;
-  };
+    const totalSum = newTotal.reduce(
+      (accumulator, currentValue) => accumulator + currentValue,
+      0
+    );
+
+    // Update the state with the new total
+    setTotal(totalSum);
+  }, [tableData]);
 
   const addressFormat = (address: any) => {
     const billingAddress = address; // Access the original data
@@ -428,11 +442,9 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                           <TableHeader>
                             <TableRow>
                               <TableHead className="w-6"></TableHead>
-                              <TableHead className="text-center">
-                                Item
-                              </TableHead>
+                              <TableHead className="text-left">Item</TableHead>
                               <TableHead colSpan={3} className="">
-                                Description
+                                Price
                               </TableHead>
                               <TableHead className="text-center">
                                 Quantity
@@ -488,7 +500,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                                             <CommandItem
                                               key={product.id}
                                               value={product.name}
-                                              className="bg-background aria-selected:bg-stone-400 "
+                                              className="bg-background aria-selected:bg-background"
                                               onSelect={(currentValue) => {
                                                 console.log(currentValue);
                                                 setValue(currentValue);
@@ -507,10 +519,11 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                                                     );
                                                   newData[index].price =
                                                     prices.unit_amount;
+                                                  newData[index].price_id =
+                                                    prices.id;
                                                 }
                                                 newData[index].open = false;
                                                 setTableData(newData);
-                                                () => calculateTotal;
                                               }}
                                             >
                                               {row.item === product.name && (
@@ -538,11 +551,29 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                                     value={row.quantity}
                                     onChange={(e) => {
                                       const newData = [...tableData];
-                                      newData[index].quantity = parseInt(
-                                        e.target.value,
-                                        10
-                                      );
-                                      setTableData(newData);
+
+                                      // Check if the input is not empty
+                                      if (e.target.value !== "") {
+                                        const parsedValue = parseInt(
+                                          e.target.value,
+                                          10
+                                        );
+
+                                        // Check if parsedValue is a valid number
+                                        if (!isNaN(parsedValue)) {
+                                          newData[index].quantity = parsedValue;
+                                          setTableData(newData);
+                                        } else {
+                                          // Handle the case where the input is not a valid number, e.g., display an error message
+                                          console.error(
+                                            "Invalid quantity input"
+                                          );
+                                        }
+                                      } else {
+                                        // Handle the case where the input is empty (optional: set quantity to 0)
+                                        newData[index].quantity = 0; // optional: set quantity to 0
+                                        // setTableData(newData); // optional: update the state even for empty input
+                                      }
                                     }}
                                   />
                                 </TableCell>
@@ -560,15 +591,13 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                                   Add item
                                 </Button>
                               </TableCell>
-                              <TableCell colSpan={2}>
-                                <Label htmlFor="total" className="text-right">
-                                  Total:
-                                </Label>
+                              <TableCell>
+                                <Label htmlFor="total">Total:</Label>
                                 <Input
                                   id="total"
-                                  value={invoiceData.total}
-                                  onChange={handleChange}
+                                  value={balanceFormat(total.toString() ?? "0")}
                                   className="col-span-3"
+                                  readOnly
                                 />
                               </TableCell>
                             </TableRow>
