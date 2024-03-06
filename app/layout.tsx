@@ -7,6 +7,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Analytics } from "@vercel/analytics/react";
 
 import { cn } from "../lib/utils";
+import Loading from "./admin/dashboard/loading";
+import { Suspense } from "react";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -42,9 +44,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <main className="min-h-screen w-full max-w-full flex flex-col">
-            {children}
-          </main>
+          <Suspense fallback={<Loading />}>
+            <main className="min-h-screen w-full max-w-full flex flex-col">
+              {children}
+            </main>
+          </Suspense>
           <Toaster />
         </ThemeProvider>
         <SpeedInsights />

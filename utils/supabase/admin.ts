@@ -7,6 +7,7 @@ import type { Database, Json, Tables, TablesInsert } from '@/types_db';
 type Product = Tables<'products'>;
 type Price = Tables<'prices'>;
 type Customer = Tables<'customers'>;
+type Job = Tables<'jobs'>;
 
 // Change to control trial period length
 const TRIAL_PERIOD_DAYS = 0;
@@ -14,8 +15,8 @@ const TRIAL_PERIOD_DAYS = 0;
 // Note: supabaseAdmin uses the SERVICE_ROLE_KEY which you must only use in a secure server-side context
 // as it has admin privileges and overwrites RLS policies!
 const supabaseAdmin = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
 const upsertProductRecord = async (product: Stripe.Product) => {
@@ -34,6 +35,30 @@ const upsertProductRecord = async (product: Stripe.Product) => {
   if (upsertError)
     throw new Error(`Product insert/update failed: ${upsertError.message}`);
   console.log(`Product inserted/updated: ${product.id}`);
+};
+
+const upsertJobRecord = async (job: Job ) => {
+  console.log(supabaseAdmin);
+  const jobData: Job = {
+
+    invoice_id: job.invoice_id,
+    is_paid: false,
+    is_work_done: false,
+    work_completed_date: null,
+    products: job.products ,
+    customer: job.customer,
+    employee: job.employee,
+    job_status: "pending",
+    invoice_status: "draft",
+    address: job.address
+  };
+
+  const { data: jobs, error: upsertError } = await supabaseAdmin
+    .from('jobs')
+    .upsert(jobData);
+  if (upsertError)
+    throw new Error(`Job insert/update failed: ${upsertError.message}`);
+  console.log(`Job inserted/updated: ${jobs!}`);
 };
 
 const upsertCustomer = async (customer: Stripe.Customer) => {
@@ -315,5 +340,6 @@ export {
   deletePriceRecord,
   createOrRetrieveCustomer,
   manageSubscriptionStatusChange,
-  upsertCustomer
+  upsertCustomer,
+  upsertJobRecord
 };

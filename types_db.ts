@@ -33,6 +33,60 @@ export interface Database {
         Relationships: [
         ]
       }
+      jobs: {
+        Row: {
+          invoice_id: string | null
+          is_paid: boolean
+          is_work_done: boolean
+          work_completed_date: string | null
+          products: Json[] | null
+          customer: string | null
+          employee: string | null
+          job_status: Database["public"]["Enums"]["job_status"] | null
+          invoice_status: Database["public"]["Enums"]["invoice_status"] | null
+          address: Json | null
+        }
+        Insert: {
+          invoice_id?: string | null
+          is_paid?: boolean
+          is_work_done?: boolean
+          work_completed_date?: string | null
+          products?: Json[] | null
+          customer: string | null
+          employee: string | null
+          job_status?: Database["public"]["Enums"]["job_status"] | null
+          invoice_status?: Database["public"]["Enums"]["invoice_status"] | null
+          address?: Json | null
+        }
+        Update: {
+          invoice_id?: string | null
+          is_paid?: boolean
+          is_work_done?: boolean
+          work_completed_date?: string | null
+          products?: Json[] | null
+          customer: string | null
+          employee: string | null
+          job_status?: Database["public"]["Enums"]["job_status"] | null
+          invoice_status?: Database["public"]["Enums"]["invoice_status"] | null
+          address?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jobs_customer_fkey"
+            columns: ["customer"]
+            isOneToOne: false
+            referencedRelation: "customer"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jobs_employee_fkey"
+            columns: ["employee"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       prices: {
         Row: {
           active: boolean | null
@@ -225,6 +279,9 @@ export interface Database {
         | "past_due"
         | "unpaid"
         | "paused"
+      invoice_status: "draft" | "approved" | "paid" | "error"
+      job_status: "pending" | "complete" | "error" | "hold"
+      quote_status: "started" | "complete" | "approved"
     }
     CompositeTypes: {
       [_ in never]: never

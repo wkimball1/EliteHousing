@@ -62,6 +62,7 @@ import Link from "next/link";
 import handleStripePortalRequest from "@/components/handle-stripe-portal";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -69,6 +70,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Json, Tables } from "@/types_db";
+import { Form } from "react-hook-form";
+import { upsertJobRecord } from "@/utils/supabase/admin";
+import { supabaseServer } from "@/components/supabaseServer";
+
+type Job = Tables<"jobs">;
 
 interface TableRow {
   id: string;
@@ -87,6 +94,25 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
   const [stripeCustomer, setStripeCustomer] = useState<any | null>(null);
   const [stripeInvoices, setStripeInvoices] = useState<any | null>(null);
   const [value, setValue] = useState("");
+  const [billing, setBilling] = useState<any | null>({
+    line1: "",
+    line2: "",
+    state: "",
+    city: "",
+    postal_code: "",
+  });
+  const [supabaseJob, setSupabaseJob] = useState<Job | null>({
+    invoice_id: "",
+    is_paid: false,
+    is_work_done: false,
+    work_completed_date: null,
+    products: [],
+    customer: "",
+    employee: "",
+    job_status: "pending",
+    invoice_status: "draft",
+    address: "",
+  });
   const [tableData, setTableData] = useState([
     {
       id: "",
@@ -121,7 +147,9 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
   const [invoiceData, setNewInvoice] = useState<any | null>({
     customer: "",
     description: "",
-    metadata: { employee: "" },
+    metadata: { job_id: "" },
+    total: 0,
+    amount_due: 0,
   });
 
   const supabase = createClient();
@@ -164,6 +192,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
         });
         setStripeInvoices(stripeCustomerInvoices);
         console.log(stripeCustomerInvoices);
+        setBilling(customer![0].billing_address);
       } catch (err) {
         console.log("Error occured when fetching data" + err);
       }
@@ -171,12 +200,53 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
     })();
   }, []);
 
+  const handleSubmit = async () => {
+    const newJob = supabaseJob!;
+    newJob.products = tableData.map((data) => {
+      const container = { id: data.id, quantity: data.quantity };
+      return container;
+    });
+    newJob.customer = supabaseCustomer![0].id;
+    newJob.employee = invoiceData.metadata.employee;
+    newJob.address = billing;
+    console.log(newJob);
+    const jobs = await supabaseServer(newJob);
+    console.log(jobs);
+  };
+
+  const handleChange = (e: { target: { name: any; value: any } }) => {
+    setBilling((prevBilling: any) => {
+      return {
+        ...prevBilling,
+        [e.target.name]: e.target.value,
+      };
+    });
+  };
+
+  const calculateTotal = () => {
+    const newTotal = tableData.map((item) => {
+      return item.price * item.quantity;
+    });
+    const totalSum = newTotal.reduce((accumulator, currentValue) => {
+      return accumulator + currentValue;
+    }, 0);
+    console.log(totalSum);
+    setNewInvoice({
+      ...invoiceData,
+      amount_due: totalSum,
+      total: totalSum,
+    });
+    return totalSum;
+  };
+
   const addressFormat = (address: any) => {
     const billingAddress = address; // Access the original data
 
     // Access the "line1" property from the billing address object
     const line1 =
-      billingAddress && billingAddress.line1 ? billingAddress.line1 : "N/A";
+      billingAddress && billingAddress.line1 ? billingAddress.line1 : "";
+    const line2 =
+      billingAddress && billingAddress.line2 ? billingAddress.line2 : "";
     const state =
       billingAddress && billingAddress.state ? billingAddress.state : "";
     const city =
@@ -187,16 +257,18 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
         : "";
 
     // Combine line1 and city, separating them with a comma and space
-    const combinedAddress = `${line1}${line1 && city ? ", " : ""}${city}${
-      city && state ? ", " : ""
-    }${state}${(line1 || city || state) && zip ? " " : ""}${zip}`;
+    const combinedAddress = `${line1}${line1 && line2 ? ", " : ""}${line2}${
+      line1 && city ? ", " : ""
+    }${city}${city && state ? ", " : ""}${state}${
+      (line1 || city || state) && zip ? " " : ""
+    }${zip}`;
     return combinedAddress;
   };
 
   if (!supabaseCustomer || isLoading) {
     return (
-      <div>
-        <h1>Loading...</h1>
+      <div className="m-auto">
+        <span className="loading loading-spinner loading-lg"></span>
       </div>
     );
   } else {
@@ -243,7 +315,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
             <div className="items-start justify-start py-4 text-sm">
               {!!supabaseCustomer[0] && !!supabaseCustomer![0].id ? (
                 <Button
-                  className="bg-background text-foreground"
+                  className="bg-background text-foreground hover:bg-slate-500"
                   variant="outline"
                   onClick={() =>
                     handleStripePortalRequest(supabaseCustomer[0].id, pathName)
@@ -259,7 +331,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
               <Dialog>
                 <DialogTrigger asChild>
                   <Button
-                    className="bg-background text-foreground"
+                    className="bg-background text-foreground hover:bg-slate-500"
                     variant="outline"
                   >
                     Create new job
@@ -276,11 +348,11 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                   <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
                       <Label htmlFor="name" className="text-right">
-                        Name
+                        Customer Name
                       </Label>
                       <Input
                         id="name"
-                        defaultValue={supabaseCustomer[0].full_name}
+                        value={supabaseCustomer[0].full_name}
                         className="col-span-3"
                         readOnly
                         autoFocus
@@ -288,11 +360,23 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                       <Label htmlFor="line1" className="text-right">
-                        Address
+                        Street Address
                       </Label>
                       <Input
                         id="line1"
-                        defaultValue={supabaseCustomer[0].billing_address.line1}
+                        value={billing.line1}
+                        onChange={handleChange}
+                        className="col-span-3"
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="line2" className="text-right">
+                        Apt, Unit, etc. (optional)
+                      </Label>
+                      <Input
+                        id="line2"
+                        value={billing.line2}
+                        onChange={handleChange}
                         className="col-span-3"
                       />
                     </div>
@@ -302,7 +386,8 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                       </Label>
                       <Input
                         id="city"
-                        defaultValue={supabaseCustomer[0].billing_address.city}
+                        value={billing.city}
+                        onChange={handleChange}
                         className="col-span-3"
                       />
                     </div>
@@ -312,7 +397,8 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                       </Label>
                       <Input
                         id="state"
-                        defaultValue={supabaseCustomer[0].billing_address.state}
+                        value={billing.state}
+                        onChange={handleChange}
                         className="col-span-3"
                       />
                     </div>
@@ -322,9 +408,8 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                       </Label>
                       <Input
                         id="postal_code"
-                        defaultValue={
-                          supabaseCustomer[0].billing_address.postal_code
-                        }
+                        value={billing.postal_code}
+                        onChange={handleChange}
                         className="col-span-3"
                       />
                     </div>
@@ -364,7 +449,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => deleteRow(index)}
-                                    className="bg-red-500 h-5 w-5 rounded-3xl"
+                                    className="bg-red-500 h-5 w-5 rounded-3xl hover:bg-red-600"
                                   >
                                     <MinusIcon
                                       color="white"
@@ -372,7 +457,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                                     />
                                   </Button>
                                 </TableCell>
-                                <TableCell className="text-center">
+                                <TableCell className="text-center ">
                                   <Popover
                                     open={row.open}
                                     onOpenChange={(newState) => {
@@ -386,13 +471,13 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                                         variant="outline"
                                         role="combobox"
                                         aria-expanded={row.open}
-                                        className="w-[200px] justify-between"
+                                        className="w-[200px] justify-between hover:bg-background"
                                       >
                                         {value ? row.item : "Select product..."}
                                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                       </Button>
                                     </PopoverTrigger>
-                                    <PopoverContent className="w-[200px] p-0 bg-background max-h-200px overflow-y-auto">
+                                    <PopoverContent className="w-[200px] p-0 bg-background max-h-200px overflow-y-auto ">
                                       <Command>
                                         <CommandInput placeholder="Search products..." />
                                         <CommandEmpty>
@@ -403,6 +488,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                                             <CommandItem
                                               key={product.id}
                                               value={product.name}
+                                              className="bg-background aria-selected:bg-stone-400 "
                                               onSelect={(currentValue) => {
                                                 console.log(currentValue);
                                                 setValue(currentValue);
@@ -424,6 +510,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                                                 }
                                                 newData[index].open = false;
                                                 setTableData(newData);
+                                                () => calculateTotal;
                                               }}
                                             >
                                               {row.item === product.name && (
@@ -467,11 +554,22 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                                 <Button
                                   variant="ghost"
                                   onClick={() => addRow()}
-                                  className="bg-blue-500 text-sm text-foreground"
+                                  className="bg-blue-500 text-sm text-foreground hover:bg-blue-600"
                                 >
                                   <PlusIcon className="h-4 w-4" />
-                                  Add new row
+                                  Add item
                                 </Button>
+                              </TableCell>
+                              <TableCell colSpan={2}>
+                                <Label htmlFor="total" className="text-right">
+                                  Total:
+                                </Label>
+                                <Input
+                                  id="total"
+                                  value={invoiceData.total}
+                                  onChange={handleChange}
+                                  className="col-span-3"
+                                />
                               </TableCell>
                             </TableRow>
                           </TableBody>
@@ -480,7 +578,26 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button type="submit">Save changes</Button>
+                    <DialogClose asChild>
+                      <div className="flex justify-between space-x-6">
+                        <Button
+                          variant="outline"
+                          type="button"
+                          className="text-sm text-foreground hover:bg-red-500"
+                        >
+                          Cancel
+                        </Button>
+
+                        <Button
+                          variant="outline"
+                          type="submit"
+                          className="bg-background text-foreground hover:bg-stone-500"
+                          onClick={handleSubmit}
+                        >
+                          Create Job
+                        </Button>
+                      </div>
+                    </DialogClose>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
@@ -502,39 +619,13 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
               </CardContent>
               <CardFooter></CardFooter>
             </Card>
-            <Card className="w-25 h-25 md:w-32 lg:w-60 md:h-fit bg-background">
-              <CardHeader className="items-center text-sm md:text-xl">
-                <CardTitle>Balance</CardTitle>
-              </CardHeader>
-              <CardContent className="grid gap-4 items-center justify-center">
-                <p className="text-xs md:text-xl">
-                  {!!stripeCustomer && !!stripeCustomer.balance
-                    ? balanceFormat(stripeCustomer!.balance)
-                    : balanceFormat("0")}
-                </p>
-              </CardContent>
-              <CardFooter></CardFooter>
-            </Card>
-            <Card className="w-25 h-25 md:w-32 lg:w-60  md:h-fit bg-background">
-              <CardHeader className="items-center text-sm md:text-xl">
-                <CardTitle>Balance</CardTitle>
-              </CardHeader>
-              <CardContent className="grid gap-4 items-center justify-center">
-                <p className="text-xs md:text-xl">
-                  {!!stripeCustomer && !!stripeCustomer.balance
-                    ? balanceFormat(stripeCustomer!.balance)
-                    : balanceFormat("0")}
-                </p>
-              </CardContent>
-              <CardFooter></CardFooter>
-            </Card>
           </div>
 
           <div className="w-full pt-6">
             <Tabs defaultValue="invoices" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 bg-stone-100 dark:bg-stone-900">
+              <TabsList className="grid w-full grid-cols-1 bg-stone-100 dark:bg-stone-900">
                 <TabsTrigger value="invoices">Invoices</TabsTrigger>
-                <TabsTrigger value="quotes">Quotes</TabsTrigger>
+                {/* <TabsTrigger value="quotes">Quotes</TabsTrigger> */}
               </TabsList>
               <TabsContent value="invoices">
                 {!!stripeInvoices ? (
@@ -546,7 +637,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                   <></>
                 )}
               </TabsContent>
-              <TabsContent value="quotes">
+              {/* <TabsContent value="quotes">
                 <Card>
                   <CardHeader>
                     <CardTitle>Password</CardTitle>
@@ -569,7 +660,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                     <Button>Save password</Button>
                   </CardFooter>
                 </Card>
-              </TabsContent>
+              </TabsContent> */}
             </Tabs>
           </div>
         </div>

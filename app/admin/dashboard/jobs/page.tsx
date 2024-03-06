@@ -1,17 +1,13 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import { useRouter } from 'next/router'
+import React from "react";
+import PropTypes from "prop-types";
+import { useRouter } from "next/router";
 
-
-function JobsPage({searchParams} : {searchParams: {message: string}}) {
-
+function JobsPage() {
   return (
     <div>
-        <h1>{searchParams.message} Jobs</h1>
+      <h1> Jobs</h1>
     </div>
-  )
+  );
 }
 
-
-
-export default JobsPage
+export default JobsPage;

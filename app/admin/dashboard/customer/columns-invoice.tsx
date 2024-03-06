@@ -115,7 +115,9 @@ export const columns: ColumnDef<any>[] = [
         <div>
           <Button
             variant="outline"
-            className={`capitalize ${getColorClass(row.getValue("status"))}`}
+            className={`capitalize enabled:pointer-events-none ${getColorClass(
+              row.getValue("status")
+            )}`}
           >
             {row.getValue("status")}
           </Button>
@@ -162,7 +164,7 @@ export const columns: ColumnDef<any>[] = [
         <Dialog>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="default" className="h-8 w-8 p-0">
+              <Button variant="default" className="h-8 w-8 p-0 bg-background">
                 <span className="sr-only">Open menu</span>
                 <DotsHorizontalIcon className="h-4 w-4" />
               </Button>
