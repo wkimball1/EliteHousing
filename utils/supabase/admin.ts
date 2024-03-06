@@ -66,8 +66,8 @@ const upsertJobFromStripe = async (invoice: Stripe.Invoice) => {
     .eq("invoice_id", invoice.id);
   const lineItems = invoice.lines.data.map((line) => {
     return {
+      id: line.price!.product,
       quantity: line.quantity,
-      productId: line.price?.product ?? "",
       // Adjust the property names accordingly based on your data structure
     };
   });
@@ -77,7 +77,7 @@ const upsertJobFromStripe = async (invoice: Stripe.Invoice) => {
       is_paid: invoice.paid,
       is_work_done: false,
       work_completed_date: null,
-      products: data[0].products,
+      products: lineItems as Json[],
       customer: data[0].customer,
       employee: data[0].employee,
       job_status: "pending",
