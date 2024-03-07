@@ -1,12 +1,10 @@
-"use server"
-import { Tables } from '@/types_db';
+'use server';
+import { Tables, TablesInsert } from '@/types_db';
 import { upsertJobRecord } from '@/utils/supabase/admin';
-import React from 'react'
+import React from 'react';
 
-type Job = Tables<"jobs">;
+type Job = TablesInsert<'jobs'>;
 
 export const supabaseServer = (job: Job) => {
-  return (
-    upsertJobRecord(job)
-  )
-}
+  return upsertJobRecord(job);
+};

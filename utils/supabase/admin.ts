@@ -46,7 +46,7 @@ const upsertProductRecord = async (product: Stripe.Product) => {
   console.log(`Product inserted/updated: ${product.id}`);
 };
 
-const upsertJobRecord = async (job: Job) => {
+const upsertJobRecord = async (job: InsertJob) => {
   const jobData: InsertJob = {
     invoice_id: job.invoice_id,
     is_paid: false,

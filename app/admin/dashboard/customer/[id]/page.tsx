@@ -72,12 +72,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Json, Tables } from "@/types_db";
+import { Json, Tables, TablesInsert } from "@/types_db";
 import { Form } from "react-hook-form";
 import { upsertJobRecord } from "@/utils/supabase/admin";
 import { supabaseServer } from "@/components/supabaseServer";
 
-type Job = Tables<"jobs">;
+type Job = TablesInsert<"jobs">;
 
 interface TableRow {
   id: string;
