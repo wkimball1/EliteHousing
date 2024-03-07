@@ -73,12 +73,14 @@ const upsertJobFromStripe = async (invoice: Stripe.Invoice) => {
     .from("jobs")
     .select()
     .eq("invoice_id", invoice.id);
+  console.log("in invoice.id", jobs, error);
 
   if (!jobs && invoice.from_invoice) {
     const { data, error } = await supabaseAdmin
       .from("jobs")
       .select()
       .eq("invoice_id", invoice.from_invoice.invoice as string);
+    console.log("in from_invoice", data, error);
   }
   let lineItems: any[] = [];
   if (!!invoice.lines.data) {
@@ -117,12 +119,14 @@ const upsertJobFromStripe = async (invoice: Stripe.Invoice) => {
       .from("jobs")
       .update(jobData)
       .eq("invoice_id", invoice.id);
+    console.log("in update invoice id", data, error);
 
     if (!data && invoice.from_invoice) {
       const { data, error } = await supabaseAdmin
         .from("jobs")
         .update(jobData)
         .eq("invoice_id", invoice.from_invoice.invoice as string);
+      console.log("in update invoice from_id", data, error);
     }
   } else {
     console.log("error ", error);
