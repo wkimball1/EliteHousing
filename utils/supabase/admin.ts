@@ -2,11 +2,20 @@ import { toDateTime } from "@/utils/helpers";
 import { stripe } from "@/utils/stripe/config";
 import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
-import type { Database, Json, Tables, TablesInsert } from "@/types_db";
+import type {
+  Database,
+  JobUpdate,
+  Json,
+  Tables,
+  TablesInsert,
+  TablesUpdate,
+} from "@/types_db";
 
 type Product = Tables<"products">;
 type Price = Tables<"prices">;
 type Customer = Tables<"customers">;
+type UpdateJob = JobUpdate;
+type InsertJob = TablesInsert<"jobs">;
 type Job = Tables<"jobs">;
 
 // Change to control trial period length
@@ -37,8 +46,8 @@ const upsertProductRecord = async (product: Stripe.Product) => {
   console.log(`Product inserted/updated: ${product.id}`);
 };
 
-const upsertJobRecord = async (job: Job) => {
-  const jobData: Job = {
+const upsertJobRecord = async (job: InsertJob) => {
+  const jobData: InsertJob = {
     invoice_id: job.invoice_id,
     is_paid: false,
     is_work_done: false,
@@ -72,7 +81,9 @@ const upsertJobFromStripe = async (invoice: Stripe.Invoice) => {
     };
   });
   if (data) {
-    const jobData: Job = {
+    const jobData: JobUpdate = {
+      id: data[0].id,
+      created_at: data[0].created_at,
       invoice_id: invoice.id,
       is_paid: invoice.paid,
       is_work_done: false,
