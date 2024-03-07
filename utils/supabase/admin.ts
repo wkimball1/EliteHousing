@@ -73,13 +73,16 @@ const upsertJobFromStripe = async (invoice: Stripe.Invoice) => {
     .from("jobs")
     .select()
     .eq("invoice_id", invoice.id);
-  const lineItems = invoice.lines.data.map((line) => {
-    return {
-      id: line.price!.product,
-      quantity: line.quantity,
-      // Adjust the property names accordingly based on your data structure
-    };
-  });
+  let lineItems: any[] = [];
+  if (!!invoice.lines.data) {
+    lineItems = invoice.lines.data.map((line) => {
+      return {
+        id: line.price!.product,
+        quantity: line.quantity,
+        // Adjust the property names accordingly based on your data structure
+      };
+    });
+  }
   if (data) {
     const jobData: JobUpdate = {
       id: data[0].id,
