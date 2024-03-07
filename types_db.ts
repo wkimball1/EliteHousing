@@ -34,6 +34,8 @@ export interface Database {
       };
       jobs: {
         Row: {
+          id: string;
+          created_at: string;
           invoice_id: string | null;
           is_paid: boolean;
           is_work_done: boolean;
@@ -46,6 +48,8 @@ export interface Database {
           address?: Json | null;
         };
         Insert: {
+          id?: never
+          created_at?: never
           invoice_id?: string | null;
           is_paid?: boolean;
           is_work_done?: boolean;
@@ -58,6 +62,8 @@ export interface Database {
           address?: Json | null;
         };
         Update: {
+          id?: string | null
+          created_at?: string | null
           invoice_id?: string | null;
           is_paid?: boolean;
           is_work_done?: boolean;
@@ -357,6 +363,8 @@ export type TablesUpdate<
     ? U
     : never
   : never;
+
+  export type JobUpdate = Database['public']['Tables']['jobs']['Update']
 
 export type Enums<
   PublicEnumNameOrOptions extends
