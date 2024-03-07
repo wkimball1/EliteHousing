@@ -75,7 +75,7 @@ const upsertJobFromStripe = async (invoice: Stripe.Invoice) => {
     .eq("invoice_id", invoice.id);
   console.log("in invoice.id", jobs, error);
 
-  if ((!jobs?.length ?? true) && invoice.from_invoice) {
+  if (!jobs?.length && invoice.from_invoice) {
     const { data, error } = await supabaseAdmin
       .from("jobs")
       .select()
