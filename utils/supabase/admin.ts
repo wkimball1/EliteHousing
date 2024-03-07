@@ -69,20 +69,16 @@ const upsertJobRecord = async (job: InsertJob) => {
 };
 
 const upsertJobFromStripe = async (invoice: Stripe.Invoice) => {
-  let invoiceId = invoice.id;
-  if (invoice.from_invoice) {
-    invoiceId = invoice.from_invoice.invoice as string;
-  }
-  const { data, error } = await supabaseAdmin
+  const { data: jobs, error } = await supabaseAdmin
     .from("jobs")
     .select()
-    .eq("invoice_id", invoiceId);
+    .eq("invoice_id", invoice.id);
 
-  if (error) {
-    const { error } = await supabaseAdmin
+  if (!jobs && invoice.from_invoice) {
+    const { data, error } = await supabaseAdmin
       .from("jobs")
       .select()
-      .eq("invoice_id", invoice.id);
+      .eq("invoice_id", invoice.from_invoice.invoice as string);
   }
   let lineItems: any[] = [];
   if (!!invoice.lines.data) {
@@ -94,17 +90,17 @@ const upsertJobFromStripe = async (invoice: Stripe.Invoice) => {
       };
     });
   }
-  if (data) {
+  if (jobs) {
     const jobData: JobUpdate = {
-      id: data[0].id,
-      created_at: data[0].created_at,
+      id: jobs[0].id,
+      created_at: jobs[0].created_at,
       invoice_id: invoice.id,
       is_paid: invoice.paid,
       is_work_done: false,
       work_completed_date: null,
       products: lineItems as Json[],
-      customer: data[0].customer,
-      employee: data[0].employee,
+      customer: jobs[0].customer,
+      employee: jobs[0].employee,
       job_status: "pending",
       invoice_status: invoice.status as
         | "error"
@@ -114,19 +110,19 @@ const upsertJobFromStripe = async (invoice: Stripe.Invoice) => {
         | "open"
         | "void"
         | null,
-      address: data[0].address,
+      address: jobs[0].address,
     };
 
-    const { error } = await supabaseAdmin
+    const { data, error } = await supabaseAdmin
       .from("jobs")
       .update(jobData)
-      .eq("invoice_id", invoiceId);
+      .eq("invoice_id", invoice.id);
 
-    if (error) {
-      const { error } = await supabaseAdmin
+    if (!data && invoice.from_invoice) {
+      const { data, error } = await supabaseAdmin
         .from("jobs")
         .update(jobData)
-        .eq("invoice_id", invoice.id);
+        .eq("invoice_id", invoice.from_invoice.invoice as string);
     }
   } else {
     console.log("error ", error);
