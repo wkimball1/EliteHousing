@@ -69,7 +69,7 @@ const upsertJobRecord = async (job: InsertJob) => {
 };
 
 const upsertJobFromStripe = async (invoice: Stripe.Invoice) => {
-  const { data: jobs, error } = await supabaseAdmin
+  let { data: jobs, error } = await supabaseAdmin
     .from("jobs")
     .select()
     .eq("invoice_id", invoice.id);
@@ -80,8 +80,10 @@ const upsertJobFromStripe = async (invoice: Stripe.Invoice) => {
       .from("jobs")
       .select()
       .eq("invoice_id", invoice.from_invoice.invoice as string);
+    jobs = data;
     console.log("in from_invoice", data, error);
   }
+  console.log(jobs);
   let lineItems: any[] = [];
   if (!!invoice.lines.data) {
     lineItems = invoice.lines.data.map((line) => {
