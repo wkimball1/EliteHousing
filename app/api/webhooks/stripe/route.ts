@@ -15,6 +15,8 @@ const relevantEvents = new Set([
   "customer.updated",
   "customer.deleted",
   "invoice.updated",
+  "invoice.finalized",
+  "invoice.voided",
   "product.created",
   "product.updated",
   "product.deleted",
@@ -51,6 +53,8 @@ export async function POST(req: Request) {
           await upsertCustomer(event.data.object as Stripe.Customer);
           break;
         case "invoice.updated":
+        case "invoice.finalized":
+        case "invoice.voided":
           await upsertJobFromStripe(event.data.object as Stripe.Invoice);
           break;
         case "product.created":

@@ -281,7 +281,7 @@ export interface Database {
         | "past_due"
         | "unpaid"
         | "paused";
-      invoice_status: "draft" | "approved" | "paid" | "error" | "open";
+      invoice_status: "draft" | "approved" | "paid" | "error" | "open" | "void";
       job_status: "pending" | "complete" | "error" | "hold";
       quote_status: "started" | "complete" | "approved";
     };

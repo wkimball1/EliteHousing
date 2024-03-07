@@ -87,12 +87,25 @@ const upsertJobFromStripe = async (invoice: Stripe.Invoice) => {
         | "approved"
         | "paid"
         | "open"
+        | "void"
         | null,
       address: data[0].address,
     };
-    const { error: upsertError } = await supabaseAdmin
+    let invoiceId = invoice.id;
+    if (invoice.from_invoice) {
+      invoiceId = invoice.from_invoice.invoice as string;
+    }
+    const { error } = await supabaseAdmin
       .from("jobs")
-      .upsert([jobData]);
+      .update(jobData)
+      .eq("invoice_id", invoiceId);
+
+    if (error) {
+      const { error } = await supabaseAdmin
+        .from("jobs")
+        .update(jobData)
+        .eq("invoice_id", invoice.id);
+    }
   } else {
     console.log("error ", error);
   }

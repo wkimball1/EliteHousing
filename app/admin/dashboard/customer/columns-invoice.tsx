@@ -61,15 +61,15 @@ const TimestampConverter = (timestamp: any) => {
 const getColorClass = (status: string) => {
   switch (status) {
     case "draft":
-      return "bg-slate-200 dark:bg-slate-500";
+      return "bg-slate-50 dark:bg-slate-700";
     case "open":
-      return "bg-slate-50 dark:bg-stone-700";
+      return "bg-slate-200 dark:bg-stone-500";
     case "paid":
       return "bg-green-500";
     case "uncollectable":
       return "bg-red-500";
     case "void":
-      return "bg-stone-400";
+      return "bg-stone-500";
     default:
       return "bg-background";
   }
