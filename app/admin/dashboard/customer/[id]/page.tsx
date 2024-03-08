@@ -224,7 +224,8 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
     const jobs = await supabaseServer(newJob);
   };
 
-  const handleChange = (e: { target: { name: any; value: any } }) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
     setBilling((prevBilling: any) => {
       return {
         ...prevBilling,
@@ -232,7 +233,6 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
       };
     });
   };
-
   useEffect(() => {
     // Calculate the new total whenever tableData changes
     const newTotal = tableData.map((item) => {

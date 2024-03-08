@@ -34,10 +34,7 @@ export default function ContactPage() {
           className="w-3/4 md:w-3/4 lg:w-1/2 xl:w-1/4"
         >
           <div className="mb-5">
-            <label
-              htmlFor="name"
-              className="mb-3 block text-base font-medium text-primary"
-            >
+            <label htmlFor="name" className="mb-3 block text-base font-medium">
               Full Name*
             </label>
             <input
@@ -50,10 +47,7 @@ export default function ContactPage() {
             />
           </div>
           <div className="mb-5">
-            <label
-              htmlFor="email"
-              className="mb-3 block text-base font-medium text-primary"
-            >
+            <label htmlFor="email" className="mb-3 block text-base font-medium">
               Email Address*
             </label>
             <input
@@ -68,7 +62,7 @@ export default function ContactPage() {
           <div className="mb-5">
             <label
               htmlFor="message"
-              className="mb-3 block text-base font-medium text-primary"
+              className="mb-3 block text-base font-medium"
             >
               Message*
             </label>
@@ -81,7 +75,7 @@ export default function ContactPage() {
             ></textarea>
           </div>
           <div>
-            <button className="hover:shadow-form rounded-md bg-blue-500 py-3 px-8 text-base font-semibold text-white outline-none w-full">
+            <button className="hover:shadow-form rounded-md bg-blue-500 py-3 px-8 text-base font-semibold outline-none w-full">
               Submit
             </button>
           </div>
