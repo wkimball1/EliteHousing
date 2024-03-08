@@ -1,4 +1,3 @@
-"use client";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import defaultLogo from "@/img/logo.png";
@@ -7,66 +6,69 @@ import { FiMenu as Icon } from "react-icons/fi";
 import Image from "next/image";
 
 export default function NavBar() {
-  const [navBar, setNavBar] = useState(false);
-
   return (
     <div className="w-full max-w-full py-0">
       {/* desktop */}
-      <nav className="hidden sticky top-0 z-10 lg:block w-full max-w-full px-4 py-2 text-foreground bg-background border rounded-none shadow-md h-max border-background/80 bg-opacity-80 backdrop-blur-2xl backdrop-saturate-200 lg:px-8 lg:py-4">
-        <div className="flex items-center justify-between text-foreground">
-          <Link href="/">
-            <img
-              src={defaultLogo.src}
-              alt="Company Logo"
-              width={250}
-              height={150}
-              className="lightLogo"
-            />
-            <img
-              src={darkLogo.src}
-              alt="Company Logo"
-              width={250}
-              height={150}
-              className="darkLogo"
-            />
-          </Link>
-
-          <div className="flex items-center gap-4">
-            <div className="hidden mr-4 lg:block">
-              <ul className="flex flex-col gap-2 mt-2 mb-4 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6">
-                <li className="block p-2 font-sans text-sm antialiased font-normal leading-normal text-inherit">
-                  <a href="/" className="flex items-center">
-                    Home
-                  </a>
-                </li>
-                <li className="block p-2 font-sans text-sm antialiased font-normal leading-normal text-inherit">
-                  <a href="/admin/dashboard" className="flex items-center">
-                    Dashboard
-                  </a>
-                </li>
-                <li className="block p-2 font-sans text-sm antialiased font-normal leading-normal">
-                  <a href="/client/services" className="flex items-center">
-                    Our Services
-                  </a>
-                </li>
-                <li className="block p-2 font-sans text-sm antialiased font-normal leading-normal">
-                  <a href="/client/faq" className="flex items-center">
-                    FAQ
-                  </a>
-                </li>
-                <li className="block p-2 font-sans text-sm antialiased font-normal leading-normal">
-                  <a href="/client/contact" className="flex items-center">
-                    Contact Us
-                  </a>
-                </li>
-              </ul>
+      <div className="navbar bg-base-100">
+        <div className="navbar-start">
+          <div className="dropdown">
+            <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 6h16M4 12h8m-8 6h16"
+                />
+              </svg>
             </div>
+            <ul
+              tabIndex={0}
+              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
+            >
+              <li>
+                <a href="/" className="flex items-center">
+                  Home
+                </a>
+              </li>
+              <li>
+                <a>Our Services</a>
+                <ul className="p-2">
+                  <li className="block px-4 py-2 text-sm text-gray-700">
+                    Cabinets
+                  </li>
+                  <li className="block px-4 py-2 text-sm text-gray-700">
+                    Appliances
+                  </li>
+                  <li className="block px-4 py-2 text-sm text-gray-700">
+                    Lighting and Fans
+                  </li>
+                  <li className="block px-4 py-2 text-sm text-gray-700">
+                    Kitchen and Bath Plumbing
+                  </li>
+                  <li className="block px-4 py-2 text-sm text-gray-700">
+                    Countertops and Tile
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <a href="/client/faq" className="flex items-center">
+                  FAQ
+                </a>
+              </li>
+              <li>
+                <a href="/client/contact" className="flex items-center">
+                  Contact Us
+                </a>
+              </li>
+            </ul>
           </div>
-        </div>
-      </nav>
-      {/* mobile */}
-      <nav className="lg:hidden z-50 bg-background px-2 w-full max-w-full ">
-        <div className="flex justify-center justify-between w-full max-w-full">
           <Link className="flex justify-start" href="/">
             <img
               src={defaultLogo.src}
@@ -83,45 +85,54 @@ export default function NavBar() {
               className="darkLogo"
             />
           </Link>
-          <button
-            className="text-4xl text-foreground flex justify-end"
-            onClick={() => {
-              setNavBar(!navBar);
-            }}
-          >
-            <Icon />
-          </button>
         </div>
-        <div className={`lg:block ${navBar ? "block" : "hidden"}`}>
-          <ul className="flex flex-col gap-2 mb-4 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6">
-            <li className="block p-2 font-sans text-sm antialiased font-normal leading-normal text-inherit">
-              <a href="/client/notes" className="flex items-center">
-                Notes
+        <div className="navbar-end hidden lg:flex">
+          <ul className="menu menu-horizontal px-1">
+            <li>
+              <a href="/" className="flex items-center">
+                Home
               </a>
             </li>
-            <li className="block p-2 font-sans text-sm antialiased font-normal leading-normal text-inherit">
-              <a href="/admin/dashboard" className="flex items-center">
-                Dashboard
-              </a>
+            <li>
+              <details>
+                <summary>Our Services</summary>
+                <ul className="p-2">
+                  <li className="block px-4 py-2 text-sm text-gray-700">
+                    Cabinets
+                  </li>
+                  <li className="block px-4 py-2 text-sm text-gray-700">
+                    Appliances
+                  </li>
+                  <li className="block px-4 py-2 text-sm text-gray-700">
+                    Lighting and Fans
+                  </li>
+                  <li className="block px-4 py-2 text-sm text-gray-700">
+                    Kitchen and Bath Plumbing
+                  </li>
+                  <li className="block px-4 py-2 text-sm text-gray-700">
+                    Countertops and Tile
+                  </li>
+                </ul>
+              </details>
             </li>
-            <li className="block p-2 font-sans text-sm antialiased font-normal leading-normal">
-              <a href="/client/services" className="flex items-center">
-                Our Services
-              </a>
-            </li>
-            <li className="block p-2 font-sans text-sm antialiased font-normal leading-normal">
+            <li>
               <a href="/client/faq" className="flex items-center">
                 FAQ
               </a>
             </li>
-            <li className="block p-2 font-sans text-sm antialiased font-normal leading-normal">
+            <li>
               <a href="/client/contact" className="flex items-center">
                 Contact Us
               </a>
             </li>
+            <li>
+              <a href="/admin/dashboard" className="flex items-center">
+                Dashboard
+              </a>
+            </li>
           </ul>
         </div>
-      </nav>
+      </div>
     </div>
   );
 }

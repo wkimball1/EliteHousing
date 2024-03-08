@@ -25,7 +25,7 @@ export default function ContactPage() {
     <div className="w-full flex flex-1 flex-col">
       <div className="flex md:py-10 justify-center items-center">
         <h2 className="text-lg md:text-2xl font-bold">
-          Let us know how we can help you today!
+          Schedule your free consultation today!
         </h2>
       </div>
       <div className="flex w-full pt-8 justify-center items-start flex-1 bg-background">

@@ -1,4 +1,4 @@
-import AuthButton from "@/components/AuthButton";
+"use client";
 import NavBar from "@/components/NavBar";
 import background from "../img/kitchen-hero2.jpg";
 import step1 from "../img/step1.jpg";
@@ -23,7 +23,7 @@ export default async function Index() {
       <div className="w-full fixed z-50 top-0 left-0">
         <NavBar />
       </div>
-      <div className="flex flex-col w-full flex-1 bg-background items-center justify-start gap-8 pt-10 pb-4 md:pt-14 md:pb-6 px-4">
+      <div className="flex flex-col w-full flex-1 bg-background items-center justify-center gap-8 pt-10 pb-4 md:pt-14 md:pb-6 px-4">
         <div
           className="hero min-h-screen"
           style={{
@@ -62,45 +62,78 @@ export default async function Index() {
         </div>
         <div className="divider py-12"></div>
         <div className="flex flex-col justify-start items-center">
-          <h2 className="text-xl md:text-3xl font-semibold">WHAT WE OFFER</h2>
-          <div className="flex flex-col justify-center items-center sm:flex-row sm:flex-wrap w-full justify-around pt-8">
-            <Card className="border-none w-96 my-2 md:mx-2">
+          <h2 className="text-2xl md:text-3xl font-semibold">WHAT WE OFFER</h2>
+          <div className="flex flex-col justify-center items-center sm:flex-row sm:flex-wrap w-full justify-around pt-8 ">
+            <Card className="border-none w-96 my-2 md:mx-2 shadow-xl">
               <CardHeader>
                 <CardTitle>
-                  <BiCabinet size={40} />
+                  <BiCabinet size={50} className="bg-slate-500 rounded" />
                 </CardTitle>
+                <CardDescription className="text-xl md:text-3xl font-semibold py-2">
+                  Cabinets
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <p>Kitchen, Bath, and Laundry Room Cabinets</p>
+                <p>
+                  Elevate your spaces with our bespoke cabinetry solutions. Our
+                  expert craftsmen specialize in designing and installing
+                  high-quality kitchen, bath, and laundry room cabinets.
+                  Transform your interiors with functional and aesthetically
+                  pleasing storage solutions tailored to your unique style.
+                </p>
               </CardContent>
             </Card>
-            <Card className="border-none w-96 my-2 md:mx-2">
+            <Card className="border-none w-96 my-2 md:mx-2 shadow-xl">
               <CardHeader>
                 <CardTitle>
-                  <MdOutlineCountertops size={40} />
+                  <MdOutlineCountertops
+                    size={50}
+                    className="bg-slate-500 rounded"
+                  />
                 </CardTitle>
+                <CardDescription className="text-xl md:text-3xl font-semibold py-2">
+                  Kitchen and Bath
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <p>Kitchen and Bath Plumbing, Countertops, and Floor Tile</p>
+                <p>
+                  Revitalize your kitchen and bath spaces with our comprehensive
+                  plumbing, countertops, and floor tile services. From precision
+                  plumbing installations to luxurious countertop selections and
+                  exquisite floor tile designs, we bring elegance and
+                  functionality to every corner of your home. Trust our skilled
+                  team for seamless and stunning transformations.
+                </p>
               </CardContent>
             </Card>
-            <Card className="border-none w-96 my-2 md:mx-2">
+            <Card className="border-none w-96 my-2 md:mx-2 shadow-xl">
               <CardHeader>
                 <CardTitle>
-                  <LuLampCeiling size={40} />
+                  <LuLampCeiling size={50} className="bg-slate-500 rounded" />
                 </CardTitle>
+                <CardDescription className="text-xl md:text-3xl font-semibold py-2">
+                  Lighting and Fans
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <p>Lighting and Fans</p>
+                <p>
+                  Illuminate your living spaces with our curated collection of
+                  lighting fixtures and fans. Our selection includes stylish and
+                  energy-efficient options to enhance the ambiance of your home.
+                  Whether you're seeking modern pendant lights, classic
+                  chandeliers, or efficient ceiling fans, our experts will
+                  assist you in choosing the perfect lighting solutions for
+                  every room.
+                </p>
               </CardContent>
             </Card>
           </div>
           <div className="divider py-12"></div>
-          <h2 className="text-xl md:text-3xl font-semibold">
+          <h2 className="text-2xl md:text-3xl font-semibold">
             WHAT TO DO NEXT?
           </h2>
-          <div className="flex flex-col items-center justify-center sm:flex-row sm:flex-wrap w-full justify-around mt-12">
-            <Card className="w-full my-2 md:mx-2 sm:w-1/4 md:w-1/4 lg:w-1/4">
+          <div className="flex flex-col items-center justify-center sm:flex-row sm:flex-wrap w-full justify-around my-12">
+            <Card className="w-full my-2 md:mx-2 sm:w-1/4 md:w-1/4 lg:w-1/4 shadow-xl">
               <CardHeader>
                 <CardTitle>1. BOOK A FREE CONSULTATION!</CardTitle>
               </CardHeader>
@@ -114,7 +147,7 @@ export default async function Index() {
                 <p className="font-semibold">Share your goals and budget.</p>
               </CardFooter>
             </Card>
-            <Card className="w-full my-2 md:mx-2 sm:w-1/4 md:w-1/4 lg:w-1/4">
+            <Card className="w-full my-2 md:mx-2 sm:w-1/4 md:w-1/4 lg:w-1/4 shadow-xl">
               <CardHeader>
                 <CardTitle>2. AN EXPERT COMES TO YOUR HOME!</CardTitle>
               </CardHeader>
@@ -131,7 +164,7 @@ export default async function Index() {
                 </p>
               </CardFooter>
             </Card>
-            <Card className="w-full my-2 md: mx-2 sm:w-1/4 md:w-1/4 lg:w-1/4">
+            <Card className="w-full my-2 md: mx-2 sm:w-1/4 md:w-1/4 lg:w-1/4 shadow-xl">
               <CardHeader>
                 <CardTitle>3. INSTALLATION & PROJECT MANAGEMENT</CardTitle>
               </CardHeader>
