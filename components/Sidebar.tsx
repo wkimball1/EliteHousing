@@ -7,7 +7,7 @@ import defaultLogo from "@/img/logo.png";
 import darkLogo from "@/img/logo-white.png";
 import AuthButton from "./AuthButton";
 
-export default function SideBar() {
+export default function Sidebar() {
   return (
     <div className="drawer lg:drawer-open">
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
