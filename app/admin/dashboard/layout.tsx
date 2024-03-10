@@ -1,7 +1,7 @@
 "use client";
 import React, { Suspense, useState } from "react";
 import Head from "next/head";
-import SideBar from "../../../components/SideBar";
+import SideBar from "@/components/SideBar";
 import Loading from "./loading";
 import AuthButton from "@/components/AuthButton";
 
