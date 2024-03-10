@@ -1,35 +1,23 @@
-"use client";
-
 import * as React from "react";
 
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { useCallback, useState } from "react";
 import {
-  CaretSortIcon,
-  ChevronDownIcon,
-  DotsHorizontalIcon,
-} from "@radix-ui/react-icons";
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import { Tables, Json } from "@/types_db";
+  MantineReactTable,
+  useMantineReactTable,
+  type MRT_ColumnDef,
+  type MRT_Row,
+} from "mantine-react-table";
+import { Box, Button } from "@mantine/core";
+import { IconDownload } from "@tabler/icons-react";
+import { jsPDF } from "jspdf"; //or use your library of choice here
+import autoTable from "jspdf-autotable";
 
 import { Input } from "@/components/ui/input";
+import { type Invoice } from "./[id]/invoiceType";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { createStripePortal } from "@/utils/stripe/server";
 import handleStripePortalRequest from "@/components/handle-stripe-portal";
 
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -61,9 +49,9 @@ const TimestampConverter = (timestamp: any) => {
 const getColorClass = (status: string) => {
   switch (status) {
     case "draft":
-      return "bg-slate-50 dark:bg-slate-700";
+      return "bg-slate-100 dark:bg-slate-700";
     case "open":
-      return "bg-slate-200 dark:bg-stone-500";
+      return "bg-slate-300 dark:bg-stone-500";
     case "paid":
       return "bg-green-500";
     case "uncollectable":
@@ -75,33 +63,17 @@ const getColorClass = (status: string) => {
   }
 };
 
-export const columns: ColumnDef<any>[] = [
+const columns: MRT_ColumnDef<Invoice>[] = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
+    accessorKey: "select",
+    header: "select",
+    size: 40,
   },
   {
     accessorKey: "amount_due",
-    header: "Amount",
-    cell: ({ row }) => (
+    header: "Amount Due",
+    size: 120,
+    Cell: ({ row }) => (
       <div className="capitalize">
         {balanceFormat(row.getValue("amount_due"))}
       </div>
@@ -110,11 +82,12 @@ export const columns: ColumnDef<any>[] = [
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => {
+    size: 120,
+    Cell: ({ row }) => {
       return (
         <div>
           <Button
-            variant="outline"
+            variant="ghost"
             className={`capitalize enabled:pointer-events-none ${getColorClass(
               row.getValue("status")
             )}`}
@@ -125,26 +98,12 @@ export const columns: ColumnDef<any>[] = [
       );
     },
   },
-  {
-    accessorKey: "id",
-    header: "Invoice Number",
-    cell: ({ row }) => <div>{row.getValue("id")}</div>,
-  },
+  { accessorKey: "id", header: "Invoice Id", size: 300 },
   {
     accessorKey: "due_date",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          className="pl-0"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Due Date
-          <CaretSortIcon className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
+    header: "Due Date",
+    size: 120,
+    Cell: ({ row }) => (
       <div className="capitalize">
         {!!row.getValue("due_date")
           ? TimestampConverter(row.getValue("due_date"))
@@ -152,69 +111,78 @@ export const columns: ColumnDef<any>[] = [
       </div>
     ),
   },
-
-  {
-    id: "actions",
-    enableHiding: false,
-    header: "Actions",
-    cell: ({ row }) => {
-      const invoice = row.original;
-      const router = useRouter();
-      return (
-        <Dialog>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="default" className="h-8 w-8 p-0 bg-background">
-                <span className="sr-only">Open menu</span>
-                <DotsHorizontalIcon className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="bg-background flex flex-col items-center text-sm"
-            >
-              <InvoiceDialog invoice={invoice} />
-              <Link
-                href={
-                  !!invoice && !!invoice.invoice_pdf ? invoice.invoice_pdf : ""
-                }
-                rel="noopener noreferrer"
-                target="_blank"
-                className={
-                  !!invoice && !!invoice.invoice_pdf
-                    ? " "
-                    : "pointer-events-none"
-                }
-                aria-disabled={!invoice || !invoice.invoice_pdf}
-                tabIndex={!invoice || !invoice.invoice_pdf ? -1 : undefined}
-              >
-                View Invoice
-              </Link>
-              <DropdownMenuSeparator />
-              <Link
-                href={
-                  !!invoice && !!invoice.hosted_invoice_url
-                    ? invoice.hosted_invoice_url
-                    : ""
-                }
-                rel="noopener noreferrer"
-                target="_blank"
-                className={
-                  !!invoice && !!invoice.hosted_invoice_url
-                    ? " "
-                    : "pointer-events-none"
-                }
-                aria-disabled={!invoice || !invoice.hosted_invoice_url}
-                tabIndex={
-                  !invoice || !invoice.hosted_invoice_url ? -1 : undefined
-                }
-              >
-                Pay Invoice
-              </Link>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </Dialog>
-      );
-    },
-  },
+  { accessorKey: "actions", header: "Actions", size: 40 },
 ];
+
+const InvoiceTable = ({ data }: { data: Invoice[] }) => {
+  const handleExportRows = (rows: MRT_Row<Invoice>[]) => {
+    const doc = new jsPDF();
+    const tableData = rows.map((row) => Object.values(row.original));
+    const tableHeaders = columns.map((c) => c.header);
+
+    autoTable(doc, {
+      head: [tableHeaders],
+      body: tableData,
+    });
+
+    doc.save("mrt-pdf-example.pdf");
+  };
+
+  const table = useMantineReactTable({
+    columns,
+    data,
+    enableRowSelection: true,
+    columnFilterDisplayMode: "popover",
+    paginationDisplayMode: "pages",
+    positionToolbarAlertBanner: "bottom",
+    renderTopToolbarCustomActions: ({ table }) => (
+      <Box
+        sx={{
+          display: "flex",
+          gap: "16px",
+          padding: "8px",
+          flexWrap: "wrap",
+        }}
+      >
+        <Button
+          variant="filled"
+          className="bg-blue-400"
+          disabled={table.getPrePaginationRowModel().rows.length === 0}
+          //export all rows, including from the next page, (still respects filtering and sorting)
+          onClick={() =>
+            handleExportRows(table.getPrePaginationRowModel().rows)
+          }
+          leftIcon={<IconDownload />}
+        >
+          Export All Rows
+        </Button>
+        <Button
+          variant="filled"
+          className="bg-blue-400"
+          disabled={table.getRowModel().rows.length === 0}
+          //export all rows as seen on the screen (respects pagination, sorting, filtering, etc.)
+          onClick={() => handleExportRows(table.getRowModel().rows)}
+          leftIcon={<IconDownload />}
+        >
+          Export Page Rows
+        </Button>
+        <Button
+          variant="filled"
+          className="bg-blue-400"
+          disabled={
+            !table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()
+          }
+          //only export selected rows
+          onClick={() => handleExportRows(table.getSelectedRowModel().rows)}
+          leftIcon={<IconDownload />}
+        >
+          Export Selected Rows
+        </Button>
+      </Box>
+    ),
+  });
+
+  return <MantineReactTable table={table} />;
+};
+
+export default InvoiceTable;

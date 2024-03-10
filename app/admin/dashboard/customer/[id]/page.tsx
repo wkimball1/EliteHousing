@@ -11,6 +11,7 @@ import {
 
 import { Check, ChevronsUpDown } from "lucide-react";
 
+import { type Invoice } from "./invoiceType";
 import LoadingDots from "@/components/ui/LoadingDots";
 import { stripe } from "@/utils/stripe/config";
 import {
@@ -33,7 +34,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { DataTableInvoices } from "../data-table-invoice";
+
 import {
   Table,
   TableBody,
@@ -58,7 +59,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import { columns } from "../columns-invoice";
+import InvoiceTable from "../columns-invoice";
 import balanceFormat from "@/components/balanceFormat";
 import Link from "next/link";
 import handleStripePortalRequest from "@/components/handle-stripe-portal";
@@ -635,7 +636,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
         </div>
         <div className="flex flex-col md:basis-3/4 pt-6 w-full max-w-sm md:max-w-full">
           <div className="flex flex-row gap-4 justify-center items-center">
-            <Card className="w-25 h-25 md:w-32 lg:w-60  md:h-fit bg-background ">
+            <Card className="w-25 h-25 md:w-32 lg:w-60 bg-background ">
               <CardHeader className="items-center text-sm md:text-xl">
                 <CardTitle>Balance</CardTitle>
               </CardHeader>
@@ -651,46 +652,11 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
           </div>
 
           <div className="w-full pt-6">
-            <Tabs defaultValue="invoices" className="w-full">
-              <TabsList className="grid w-full grid-cols-1 bg-stone-100 dark:bg-stone-900">
-                <TabsTrigger value="invoices">Invoices</TabsTrigger>
-                {/* <TabsTrigger value="quotes">Quotes</TabsTrigger> */}
-              </TabsList>
-              <TabsContent value="invoices">
-                {!!stripeInvoices ? (
-                  <DataTableInvoices
-                    columns={columns}
-                    data={[...stripeInvoices]}
-                  />
-                ) : (
-                  <></>
-                )}
-              </TabsContent>
-              {/* <TabsContent value="quotes">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Password</CardTitle>
-                    <CardDescription>
-                      Change your password here. After saving, you'll be logged
-                      out.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <div className="space-y-1">
-                      <Label htmlFor="current">Current password</Label>
-                      <Input id="current" type="password" />
-                    </div>
-                    <div className="space-y-1">
-                      <Label htmlFor="new">New password</Label>
-                      <Input id="new" type="password" />
-                    </div>
-                  </CardContent>
-                  <CardFooter>
-                    <Button>Save password</Button>
-                  </CardFooter>
-                </Card>
-              </TabsContent> */}
-            </Tabs>
+            {!!stripeInvoices ? (
+              <InvoiceTable data={[...stripeInvoices] as Invoice[]} />
+            ) : (
+              <></>
+            )}
           </div>
         </div>
       </div>

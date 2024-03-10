@@ -1,176 +1,121 @@
-"use client";
+// "use client";
 
-import * as React from "react";
+// import React from "react";
+// import {
+//   MRT_ColumnDef,
+//   MantineReactTable,
+//   useMantineReactTable,
+//   MRT_Row,
+// } from "mantine-react-table";
+// import {
+//   Checkbox,
+//   Button,
+// } from "@mantine/core";
+// import { useRouter, useSearchParams } from "next/navigation"; // Import your router library
+// import { CaretSortIcon } from "@radix-ui/react-icons";
 
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { useCallback, useState } from "react";
-import {
-  CaretSortIcon,
-  ChevronDownIcon,
-  DotsHorizontalIcon,
-} from "@radix-ui/react-icons";
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import { Tables, Json } from "@/types_db";
+// type Customer = {
+//   id: string;
+//   full_name: string;
+//   email: string;
+//   billing_address: {
+//     line1: string;
+//     city: string;
+//     state: string;
+//     postal_code: string;
+//   };
+//   // Add other properties as needed
+// };
 
-import { Input } from "@/components/ui/input";
+// const columns: MRT_ColumnDef<Customer>[] = [
+//   {
+//     id: "select",
+//     header: ({ table }: { table: any }) => (
+//       <Checkbox
+//         checked={
+//           table.getIsAllPageRowsSelected() ||
+//           (table.getIsSomePageRowsSelected() && "indeterminate")
+//         }
+//         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+//         aria-label="Select all"
+//       />
+//     ),
+//     cell: ({ row }) => (
+//       <Checkbox
+//         checked={row.getIsSelected()}
+//         onCheckedChange={(value) => row.toggleSelected(!!value)}
+//         aria-label="Select row"
+//       />
+//     ),
+//     enableSorting: false,
+//     enableHiding: false,
+//   },
+//   // ... other columns
+//   {
+//     accessorKey: "id",
+//     header: "Id",
+//     cell: (row: MRT_Row<Customer>) => <div className="capitalize">{row.getValue("id")}</div>,
+//   },
+//   {
+//     accessorKey: "full_name",
+//     header: ({ column }) => (
+//       <Button
+//         variant="ghost"
+//         className="pl-0"
+//         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+//       >
+//         Name
+//         <CaretSortIcon className="ml-2 h-4 w-4" />
+//       </Button>
+//     ),
+//     cell: (row: MRT_Row<Customer>) => (
+//       <div className="capitalize">{row.getValue("full_name")}</div>
+//     ),
+//   },
+//   // ... other columns
+// ];
 
-import { Checkbox } from "@/components/ui/checkbox";
-import { createStripePortal } from "@/utils/stripe/server";
-import handleStripePortalRequest from "@/components/handle-stripe-portal";
+// const CustomerTable: React.FC<{ data: Customer[] }> = ({ data }) => {
+//   const router = useRouter();
+//   const searchParams = useSearchParams();
 
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+//   const createQueryString = React.useCallback(
+//     (name: string, value: string) => {
+//       const params = new URLSearchParams(searchParams.toString());
+//       params.set(name, value);
 
-type Customer = Tables<"customers">;
+//       return params.toString();
+//     },
+//     [searchParams]
+//   );
 
-export const columns: ColumnDef<Customer>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "id",
-    header: "Id",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
-  },
-  {
-    accessorKey: "full_name",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          className="pl-0"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Name
-          <CaretSortIcon className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("full_name")}</div>
-    ),
-  },
-  {
-    accessorKey: "email",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          className="pl-0"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Email
-          <CaretSortIcon className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
-  },
-  {
-    accessorKey: "billing_address",
-    header: () => <div>Address</div>,
-    cell: ({ row }) => {
-      const billingAddress = row.original.billing_address; // Access the original data
+//   const handleActions = (row: MRT_Row<Customer>) => (
+//     <div>
+//       <Button onClick={() => navigator.clipboard.writeText(row.original.id)}>
+//         Copy customer ID
+//       </Button>
+//       <Button
+//         onClick={() =>
+//           router.push(`/admin/dashboard/customer/${row.original.id}`)
+//         }
+//       >
+//         View customer details
+//       </Button>
+//     </div>
+//   );
 
-      // Access the "line1" property from the billing address object
-      const line1 =
-        billingAddress && billingAddress.line1 ? billingAddress.line1 : "N/A";
-      const state =
-        billingAddress && billingAddress.state ? billingAddress.state : "";
-      const city =
-        billingAddress && billingAddress.city ? billingAddress.city : "";
-      const zip =
-        billingAddress && billingAddress.postal_code
-          ? billingAddress.postal_code
-          : "";
+//   const table = useMantineReactTable({
+//     columns,
+//     data,
+//     renderCell: ({ column, row }) => {
+//       if (column.id === "actions") {
+//         return handleActions(row);
+//       }
+//       return column.renderCell ? column.renderCell({ column, row }) : null;
+//     },
+//   });
 
-      // Combine line1 and city, separating them with a comma and space
-      const combinedAddress = `${line1}${line1 && city ? ", " : ""}${city}${
-        city && state ? ", " : ""
-      }${state}${(line1 || city || state) && zip ? " " : ""}${zip}`;
-      return <div className="capitalize">{combinedAddress}</div>;
-    },
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const customer = row.original;
-      const router = useRouter();
-      const searchParams = useSearchParams();
+//   return <MantineReactTable table={table} />;
+// };
 
-      const createQueryString = useCallback(
-        (name: string, value: string) => {
-          const params = new URLSearchParams(searchParams.toString());
-          params.set(name, value);
-
-          return params.toString();
-        },
-        [searchParams]
-      );
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <DotsHorizontalIcon className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-background">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(customer.id)}
-            >
-              Copy customer ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() =>
-                router.push("/admin/dashboard/customer/" + customer.id)
-              }
-            >
-              View customer details
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
-  },
-];
+// export default CustomerTable;

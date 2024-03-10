@@ -40,24 +40,24 @@ export interface Database {
           is_paid: boolean;
           is_work_done: boolean;
           work_completed_date: string | null;
-          products: Json[] | null;
+          products: any[] | null;
           customer: string | null;
           employee: string | null;
           job_status: Database["public"]["Enums"]["job_status"] | null;
           invoice_status: Database["public"]["Enums"]["invoice_status"] | null;
-          address?: Json | null;
+          address?: any | null;
         };
         Insert: {
           invoice_id?: string | null;
           is_paid?: boolean;
           is_work_done?: boolean;
           work_completed_date?: string | null;
-          products?: Json[] | null;
+          products?: any[] | null;
           customer: string | null;
           employee: string | null;
           job_status?: Database["public"]["Enums"]["job_status"] | null;
           invoice_status?: Database["public"]["Enums"]["invoice_status"] | null;
-          address?: Json | null;
+          address?: any | null;
         };
         Update: {
           id?: string | null;
@@ -66,12 +66,12 @@ export interface Database {
           is_paid?: boolean;
           is_work_done?: boolean;
           work_completed_date?: string | null;
-          products?: Json[] | null;
+          products?: any[] | null;
           customer: string | null;
           employee: string | null;
           job_status?: Database["public"]["Enums"]["job_status"] | null;
           invoice_status?: Database["public"]["Enums"]["invoice_status"] | null;
-          address?: Json | null;
+          address?: any | null;
         };
         Relationships: [
           {

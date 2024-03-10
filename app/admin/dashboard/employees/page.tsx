@@ -1,5 +1,4 @@
-import { columns } from "./columns";
-import { DataTableEmployees } from "./data-table";
+import EmployeeTable from "./data-table";
 import { Tables, Json } from "@/types_db";
 import { createClient } from "@/utils/supabase/server";
 
@@ -25,7 +24,6 @@ async function getData(): Promise<User[]> {
 
 export default async function EmployeesPage() {
   const data = await getData();
-  console.log(data);
 
   return (
     <div className="flex flex-col w-full max-w-full justify-start items-center py-20 px-2">
@@ -33,7 +31,7 @@ export default async function EmployeesPage() {
         Employees
       </h1>
       <div className="container mx-auto py-10">
-        <DataTableEmployees columns={columns} data={data} />
+        <EmployeeTable data={data} />
       </div>
     </div>
   );

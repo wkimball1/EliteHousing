@@ -1,5 +1,4 @@
-import { columns } from "./columns";
-import { DataTableCustomers } from "./data-table";
+import CustomerTable from "./data-table";
 import { Tables, Json } from "@/types_db";
 import { createClient } from "@/utils/supabase/server";
 
@@ -23,7 +22,7 @@ export default async function CustomersPage() {
         Customers
       </h1>
       <div className="container mx-auto py-10">
-        <DataTableCustomers columns={columns} data={data} />
+        <CustomerTable data={data} />
       </div>
     </div>
   );

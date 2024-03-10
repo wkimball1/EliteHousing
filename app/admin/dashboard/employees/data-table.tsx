@@ -1,211 +1,135 @@
 "use client";
-
-import React from "react";
-
+import * as React from "react";
 import {
-  CaretSortIcon,
-  ChevronDownIcon,
-  DotsHorizontalIcon,
-} from "@radix-ui/react-icons";
+  MantineReactTable,
+  useMantineReactTable,
+  type MRT_ColumnDef,
+  type MRT_Row,
+} from "mantine-react-table";
+import { Box, Button } from "@mantine/core";
+import { IconDownload } from "@tabler/icons-react";
+import { jsPDF } from "jspdf"; //or use your library of choice here
+import autoTable from "jspdf-autotable";
 
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-
-import { Checkbox } from "@/components/ui/checkbox";
-
-import { Button } from "@/components/ui/button";
+import { Tables } from "@/types_db";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuCheckboxItem,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 
-interface DataTableEmployeeProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-}
+type Employees = Tables<"users">;
 
-export function DataTableEmployees<TData, TValue>({
-  columns,
-  data,
-}: DataTableEmployeeProps<TData, TValue>) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
-
-  const table = useReactTable({
-    data,
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
+const columns: MRT_ColumnDef<Employees>[] = [
+  {
+    accessorKey: "id",
+    header: "Id",
+    size: 120,
+    Cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
+  },
+  {
+    accessorKey: "full_name",
+    header: "Name",
+    size: 120,
+    Cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("full_name")}</div>
+    ),
+  },
+  {
+    accessorKey: "email",
+    header: "Email",
+    size: 120,
+    Cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+  },
+  {
+    accessorKey: "work_location",
+    header: "Work Location",
+    size: 120,
+    Cell: ({ row }) => {
+      return <div className="capitalize">{row.getValue("work_location")}</div>;
     },
+  },
+];
+
+const EmployeeTable = ({ data }: { data: Employees[] }) => {
+  const handleExportRows = (rows: MRT_Row<Employees>[]) => {
+    const doc = new jsPDF();
+    const tableData = rows.map((row) =>
+      columns
+        .filter((column) => column.accessorKey !== "avatar_url")
+        .map((column) => row.original[column.accessorKey as keyof Employees])
+    );
+    const tableHeaders = columns.map((c) => c.header);
+
+    autoTable(doc, {
+      head: [tableHeaders],
+      body: tableData,
+    });
+
+    doc.save("mrt-pdf-example.pdf");
+  };
+
+  const table = useMantineReactTable({
+    columns,
+    data,
+    enableRowSelection: true,
+    columnFilterDisplayMode: "popover",
+    paginationDisplayMode: "pages",
+    positionToolbarAlertBanner: "bottom",
+    renderTopToolbarCustomActions: ({ table }) => (
+      <Box
+        sx={{
+          display: "flex",
+          gap: "16px",
+          padding: "8px",
+          flexWrap: "wrap",
+        }}
+      >
+        <Button
+          variant="filled"
+          className="bg-blue-400"
+          disabled={table.getPrePaginationRowModel().rows.length === 0}
+          //export all rows, including from the next page, (still respects filtering and sorting)
+          onClick={() =>
+            handleExportRows(table.getPrePaginationRowModel().rows)
+          }
+          leftIcon={<IconDownload />}
+        >
+          Export All Rows
+        </Button>
+        <Button
+          variant="filled"
+          className="bg-blue-400"
+          disabled={table.getRowModel().rows.length === 0}
+          //export all rows as seen on the screen (respects pagination, sorting, filtering, etc.)
+          onClick={() => handleExportRows(table.getRowModel().rows)}
+          leftIcon={<IconDownload />}
+        >
+          Export Page Rows
+        </Button>
+        <Button
+          variant="filled"
+          className="bg-blue-400"
+          disabled={
+            !table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()
+          }
+          //only export selected rows
+          onClick={() => handleExportRows(table.getSelectedRowModel().rows)}
+          leftIcon={<IconDownload />}
+        >
+          Export Selected Rows
+        </Button>
+      </Box>
+    ),
   });
 
-  return (
-    <div className="w-full">
-      <div className="flex items-center py-4">
-        <Input
-          id="filterNames"
-          placeholder="Filter names..."
-          value={
-            (table.getColumn("full_name")?.getFilterValue() as string) ?? ""
-          }
-          onChange={(event) =>
-            table.getColumn("full_name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        <span className="px-4"></span>
-        <Input
-          id="filterWork"
-          placeholder="Filter location..."
-          value={
-            (table.getColumn("work_location")?.getFilterValue() as string) ?? ""
-          }
-          onChange={(event) =>
-            table.getColumn("work_location")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDownIcon className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-background">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
+  return <MantineReactTable table={table} />;
+};
+
+export default EmployeeTable;
