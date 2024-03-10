@@ -11,6 +11,16 @@ export default function LoginPage({
 }: {
   searchParams: { message: string };
 }) {
+  const checkLoggedIn = async () => {
+    const supabase = createClient();
+    const user = await supabase.auth.getUser();
+
+    if (user) {
+      // If user is already logged in, redirect to dashboard
+      return redirect("/admin/dashboard");
+    }
+  };
+
   const signIn = async (formData: FormData) => {
     "use server";
 
@@ -29,6 +39,8 @@ export default function LoginPage({
 
     return redirect("/admin/dashboard");
   };
+
+  checkLoggedIn;
 
   return (
     <div className="flex-1 flex flex-col w-full">

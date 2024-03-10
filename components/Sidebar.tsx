@@ -1,152 +1,79 @@
-// @/components/Layout/Sidebar.js
-import React, { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { useRouter, usePathname } from 'next/navigation'
+// @/components/Layout/MenuBarMobile.js
+import React from "react";
+import Link from "next/link";
+import { FiMenu as Icon } from "react-icons/fi";
+import { FaUser } from "react-icons/fa";
+import defaultLogo from "@/img/logo.png";
+import darkLogo from "@/img/logo-white.png";
+import AuthButton from "./AuthButton";
 
-import { SlHome } from 'react-icons/sl'
-import { BsInfoSquare, BsEnvelopeAt } from 'react-icons/bs'
-import { FaTshirt, FaRedhat } from 'react-icons/fa'
-import { MdOutlineWeb } from "react-icons/md";
-import defaultLogo from '@/img/logo.png';
-import darkLogo from '@/img/logo-white.png';
-import { PersonIcon } from '@radix-ui/react-icons'
-
-
-export default function Sidebar({show, setter} : {show:any, setter:Function}) {
-    const router = useRouter();
-    const pathname = usePathname();
-
-    // Define our base class
-    const className = "bg-background/50 w-[250px] transition-[margin-left] ease-in-out duration-500 fixed md:static top-0 bottom-0 left-0 z-40";
-    // Append class based on state of sidebar visiblity
-    const appendClass = show ? " ml-0" : " ml-[-250px] md:ml-0";
-
-    // Clickable menu items
-    const MenuItem = ({icon, name, route, extra} : { icon:any, name:any, route:any, extra:any }) => {
-        // Highlight menu item based on currently displayed route
-        const colorClass = pathname === route ? "text-foreground" : "text-foreground/50 hover:text-foreground";
-
-        if (extra != null ) {
-        return (
-            <Link
-                href={{pathname: route, query: {message: extra} }}
-                onClick={() => {
-                    setter((oldVal: any) => !oldVal);
-                }}
-                className={`flex gap-1 [&>*]:my-auto text-md pl-6 py-3 border-b-[1px] border-background/10 ${colorClass}`}
-            >
-                <div className="text-xl flex [&>*]:mx-auto w-[30px]">
-                    {icon}
-                </div>
-                <div>{name}</div>
+export default function SideBar() {
+  return (
+    <div className="drawer lg:drawer-open">
+      <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
+      <div className="drawer-content flex flex-col items-start justify-start">
+        <label
+          htmlFor="my-drawer-2"
+          className="btn btn-lg btn-ghost drawer-button lg:hidden"
+        >
+          {<Icon size={30} />}
+        </label>
+      </div>
+      <div className="drawer-side">
+        <label
+          htmlFor="my-drawer-2"
+          aria-label="close sidebar"
+          className="drawer-overlay"
+        ></label>
+        <ul className="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
+          <li>
+            <Link href="/admin/dashboard">
+              <img
+                src={defaultLogo.src}
+                alt="Company Logo"
+                width={150}
+                height={150}
+                className="lightLogo"
+              />
+              <img
+                src={darkLogo.src}
+                alt="Company Logo"
+                width={150}
+                height={150}
+                className="darkLogo"
+              />
             </Link>
-        )} 
-        else {
-        return (
-            <Link
-                href={{pathname: route }}
-                onClick={() => {
-                    setter((oldVal: any) => !oldVal);
-                }}
-                className={`flex gap-1 [&>*]:my-auto text-md pl-6 py-3 border-b-[1px] border-background/10 ${colorClass}`}
-            >
-                <div className="text-xl flex [&>*]:mx-auto w-[30px]">
-                    {icon}
-                </div>
-                <div>{name}</div>
-            </Link>
-        )
-    }
-    }
+          </li>
 
-    // Overlay to prevent clicks in background, also serves as our close button
-    const ModalOverlay = () => (
-        <div
-            className={`flex md:hidden fixed top-0 right-0 bottom-0 left-0 bg-background z-30`}
-            onClick={() => {
-                setter((oldVal:any) => {
-                    return !oldVal
-                });
-            }}
-        />
-    )
-
-    return (
-        <>
-            <div className={`${className}${appendClass}`}>
-                <div className="p-2 flex">
-                    <Link href="/admin/dashboard" onClick={() => {
-                        setter((oldVal: any) => !oldVal);
-                    }}>
-                        <img src={defaultLogo.src} alt="Company Logo" width={150} height={150} className="lightLogo"/>
-                        <img src={darkLogo.src} alt="Company Logo" width={150} height={150} className="darkLogo"/>
-                        
-                    </Link>
-                </div>
-                <div className="flex flex-col">
-                    <MenuItem
-                        name="Home"
-                        route="/admin/dashboard"
-                        icon={null}
-                        extra={null}
-                    />
-                    <MenuItem
-                        name="Employees"
-                        route="/admin/dashboard/employees"
-                        icon={null}
-                        extra={null}
-                    />
-                    <MenuItem
-                        name="Customers"
-                        route="/admin/dashboard/customers"
-                        icon={null}
-                        extra={null}
-                    />
-                    <MenuItem
-                        name="Inventory"
-                        route="/admin/dashboard/inventory"
-                        icon={null}
-                        extra={null}
-                    />
-                    <MenuItem
-                        name="Sales"
-                        route="/admin/dashboard/sales"
-                        icon={null}
-                        extra={null}
-                    />
-                    <MenuItem
-                        name="Orders"
-                        route="/admin/dashboard/orders"
-                        icon={null}
-                        extra={null}
-                    />
-                    <MenuItem
-                        name="Pending Jobs"
-                        route="/admin/dashboard/jobs"
-                        icon={null}
-                        extra="pending"
-                    />
-                    <MenuItem
-                        name="Previous Jobs"
-                        route="/admin/dashboard/jobs"
-                        icon={null}
-                        extra="previous"
-                    />
-                    <MenuItem
-                        name="Current Jobs"
-                        route="/admin/dashboard/jobs"
-                        icon={null}
-                        extra="current"
-                    />
-                    <MenuItem
-                        name="Client Website"
-                        route="/"
-                        icon={null}
-                        extra={null}
-                    />
-                </div>
-            </div>
-            {show ? <ModalOverlay /> : <></>}
-        </>
-    )
+          <li>
+            <Link href="/admin/dashboard">Home</Link>
+          </li>
+          <li>
+            <Link href="/admin/dashboard/employees">Employees</Link>
+          </li>
+          <li>
+            <Link href="/admin/dashboard/customers">Customers</Link>
+          </li>
+          <li>
+            <Link href="/admin/dashboard/inventory">Inventory</Link>
+          </li>
+          <li>
+            <Link href="/admin/dashboard/sales">Sales</Link>
+          </li>
+          <li>
+            <Link href="/admin/dashboard/orders">Orders</Link>
+          </li>
+          <li>
+            <Link href="/admin/dashboard/jobs">Jobs</Link>
+          </li>
+          <li>
+            <Link href="/">Client Website</Link>
+          </li>
+          <li>
+            <AuthButton />
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
 }
