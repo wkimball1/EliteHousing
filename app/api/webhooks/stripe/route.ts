@@ -1,7 +1,7 @@
 import Stripe from "stripe";
 import { stripe } from "@/utils/stripe/config";
 import {
-  upsertProductRecord,
+  // upsertProductRecord,
   upsertPriceRecord,
   manageSubscriptionStatusChange,
   deleteProductRecord,
@@ -17,9 +17,9 @@ const relevantEvents = new Set([
   "invoice.updated",
   "invoice.finalized",
   "invoice.voided",
-  "product.created",
-  "product.updated",
-  "product.deleted",
+  // "product.created",
+  // "product.updated",
+  // "product.deleted",
   "price.created",
   "price.updated",
   "price.deleted",
@@ -57,10 +57,10 @@ export async function POST(req: Request) {
         case "invoice.voided":
           await upsertJobFromStripe(event.data.object as Stripe.Invoice);
           break;
-        case "product.created":
-        case "product.updated":
-          await upsertProductRecord(event.data.object as Stripe.Product);
-          break;
+        // case "product.created":
+        // case "product.updated":
+        //   await upsertProductRecord(event.data.object as Stripe.Product);
+        //   break;
         case "price.created":
         case "price.updated":
           await upsertPriceRecord(event.data.object as Stripe.Price);
@@ -68,9 +68,9 @@ export async function POST(req: Request) {
         case "price.deleted":
           await deletePriceRecord(event.data.object as Stripe.Price);
           break;
-        case "product.deleted":
-          await deleteProductRecord(event.data.object as Stripe.Product);
-          break;
+        // case "product.deleted":
+        //   await deleteProductRecord(event.data.object as Stripe.Product);
+        //   break;
         case "customer.subscription.created":
         case "customer.subscription.updated":
         case "customer.subscription.deleted":

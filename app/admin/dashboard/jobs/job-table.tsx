@@ -4,11 +4,13 @@ import {
   type MRT_ColumnDef,
   type MRT_Row,
 } from "mantine-react-table";
-import { Box, Button } from "@mantine/core";
+import { Box, Button, MantineProvider, useMantineTheme } from "@mantine/core";
 import { IconDownload } from "@tabler/icons-react";
 import { jsPDF } from "jspdf"; //or use your library of choice here
 import autoTable from "jspdf-autotable";
 import { Tables } from "@/types_db";
+import { useColorScheme } from "@mantine/hooks";
+import { useState } from "react";
 
 type Jobs = Tables<"jobs">;
 
@@ -77,6 +79,7 @@ const columns: MRT_ColumnDef<Jobs>[] = [
 ];
 
 const JobsTable = ({ data }: { data: Jobs[] }) => {
+  const preferredColorScheme = useColorScheme();
   const handleExportRows = (rows: MRT_Row<Jobs>[]) => {
     const doc = new jsPDF({ orientation: "landscape" });
     const tableData: string[][] = rows.map((row) => {
@@ -208,7 +211,11 @@ const JobsTable = ({ data }: { data: Jobs[] }) => {
     ),
   });
 
-  return <MantineReactTable table={table} />;
+  return (
+    <MantineProvider theme={{ colorScheme: preferredColorScheme }}>
+      <MantineReactTable table={table} />
+    </MantineProvider>
+  );
 };
 
 export default JobsTable;

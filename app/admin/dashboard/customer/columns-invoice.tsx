@@ -6,7 +6,7 @@ import {
   type MRT_ColumnDef,
   type MRT_Row,
 } from "mantine-react-table";
-import { Box, Button } from "@mantine/core";
+import { Box, Button, MantineProvider } from "@mantine/core";
 import { IconDownload } from "@tabler/icons-react";
 import { jsPDF } from "jspdf"; //or use your library of choice here
 import autoTable from "jspdf-autotable";
@@ -31,6 +31,7 @@ import balanceFormat from "@/components/balanceFormat";
 import Link from "next/link";
 import InvoiceDialog from "./[id]/InvoiceDialog";
 import { Dialog } from "@/components/ui/dialog";
+import { useColorScheme } from "@mantine/hooks";
 
 const TimestampConverter = (timestamp: any) => {
   // Convert Unix timestamp to milliseconds
@@ -115,6 +116,7 @@ const columns: MRT_ColumnDef<Invoice>[] = [
 ];
 
 const InvoiceTable = ({ data }: { data: Invoice[] }) => {
+  const preferredColorScheme = useColorScheme();
   const handleExportRows = (rows: MRT_Row<Invoice>[]) => {
     const doc = new jsPDF();
     const tableData = rows.map((row) => Object.values(row.original));
@@ -182,7 +184,11 @@ const InvoiceTable = ({ data }: { data: Invoice[] }) => {
     ),
   });
 
-  return <MantineReactTable table={table} />;
+  return (
+    <MantineProvider theme={{ colorScheme: preferredColorScheme }}>
+      <MantineReactTable table={table} />
+    </MantineProvider>
+  );
 };
 
 export default InvoiceTable;

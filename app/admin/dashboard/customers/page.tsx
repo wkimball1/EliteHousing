@@ -17,7 +17,7 @@ export default async function CustomersPage() {
   console.log(data);
 
   return (
-    <div className="flex flex-col w-full max-w-full justify-start items-center py-20 px-2">
+    <div className="flex flex-col w-full max-w-full justify-start items-center py-4 px-2">
       <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:leading-[1.1]">
         Customers
       </h1>

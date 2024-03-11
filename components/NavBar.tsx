@@ -41,19 +41,38 @@ export default function NavBar() {
                 <a>Our Services</a>
                 <ul className="p-2">
                   <li className="block px-4 py-2 text-sm text-gray-700">
-                    Cabinets
+                    <Link href="/client/cabinets" className="flex items-center">
+                      Cabinets
+                    </Link>
                   </li>
                   <li className="block px-4 py-2 text-sm text-gray-700">
-                    Appliances
+                    <Link
+                      href="/client/appliances"
+                      className="flex items-center"
+                    >
+                      Appliances
+                    </Link>
                   </li>
                   <li className="block px-4 py-2 text-sm text-gray-700">
-                    Lighting and Fans
+                    <Link
+                      href="/client/lighting-fans"
+                      className="flex items-center"
+                    >
+                      Lighting and Fans
+                    </Link>
                   </li>
                   <li className="block px-4 py-2 text-sm text-gray-700">
-                    Kitchen and Bath Plumbing
+                    <Link href="/client/plumbing" className="flex items-center">
+                      Plumbing
+                    </Link>
                   </li>
                   <li className="block px-4 py-2 text-sm text-gray-700">
-                    Countertops and Tile
+                    <Link
+                      href="/client/countertops-tile"
+                      className="flex items-center"
+                    >
+                      Countertops and Tile
+                    </Link>
                   </li>
                 </ul>
               </li>
@@ -96,21 +115,40 @@ export default function NavBar() {
             <li>
               <details>
                 <summary>Our Services</summary>
-                <ul className="p-2">
+                <ul className="p-2 w-40">
                   <li className="block px-4 py-2 text-sm text-gray-700">
-                    Cabinets
+                    <Link href="/client/cabinets" className="flex items-center">
+                      Cabinets
+                    </Link>
                   </li>
                   <li className="block px-4 py-2 text-sm text-gray-700">
-                    Appliances
+                    <Link
+                      href="/client/appliances"
+                      className="flex items-center"
+                    >
+                      Appliances
+                    </Link>
                   </li>
                   <li className="block px-4 py-2 text-sm text-gray-700">
-                    Lighting and Fans
+                    <Link
+                      href="/client/lighting-fans"
+                      className="flex items-center"
+                    >
+                      Lighting and Fans
+                    </Link>
                   </li>
                   <li className="block px-4 py-2 text-sm text-gray-700">
-                    Kitchen and Bath Plumbing
+                    <Link href="/client/plumbing" className="flex items-center">
+                      Plumbing
+                    </Link>
                   </li>
                   <li className="block px-4 py-2 text-sm text-gray-700">
-                    Countertops and Tile
+                    <Link
+                      href="/client/countertops-tile"
+                      className="flex items-center"
+                    >
+                      Countertops and Tile
+                    </Link>
                   </li>
                 </ul>
               </details>

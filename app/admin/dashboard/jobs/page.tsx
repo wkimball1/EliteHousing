@@ -28,8 +28,11 @@ function JobsPage() {
     })();
   }, []);
   return (
-    <div className="flex flex-col w-full max-w-full justify-start items-center px-2">
-      <h1> Jobs</h1>
+    <div className="flex flex-col w-full max-w-full justify-start items-center py-4 px-2">
+      <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:leading-[1.1]">
+        {" "}
+        Jobs
+      </h1>
       <div className="container mx-auto py-10">
         <Tabs defaultValue="all-jobs" className="w-full">
           <TabsList className="grid w-full grid-cols-3">

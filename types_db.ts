@@ -241,6 +241,9 @@ export interface Database {
           full_name: string | null;
           id: string;
           work_location: string | null;
+          job_role: string | null;
+          salary: number | null;
+          address: any | null;
         };
         Insert: {
           avatar_url?: string | null;
@@ -248,6 +251,9 @@ export interface Database {
           full_name?: string | null;
           id: string;
           work_location?: string | null;
+          job_role?: string | null;
+          salary?: number | null;
+          address?: any | null;
         };
         Update: {
           avatar_url?: string | null;
@@ -255,6 +261,9 @@ export interface Database {
           full_name?: string | null;
           id: string;
           work_location?: string | null;
+          job_role?: string | null;
+          salary?: number | null;
+          address?: any | null;
         };
         Relationships: [
           {

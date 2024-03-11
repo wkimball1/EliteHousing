@@ -7,7 +7,7 @@ import {
   type MRT_ColumnDef,
   type MRT_Row,
 } from "mantine-react-table";
-import { Box, Button } from "@mantine/core";
+import { Box, Button, MantineProvider } from "@mantine/core";
 import { IconDownload } from "@tabler/icons-react";
 import { jsPDF } from "jspdf"; //or use your library of choice here
 import autoTable from "jspdf-autotable";
@@ -24,6 +24,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import { useColorScheme } from "@mantine/hooks";
 
 type Customers = Tables<"customers">;
 
@@ -117,6 +118,7 @@ const columns: MRT_ColumnDef<Customers>[] = [
 ];
 
 const CustomerTable = ({ data }: { data: Customers[] }) => {
+  const preferredColorScheme = useColorScheme();
   const handleExportRows = (rows: MRT_Row<Customers>[]) => {
     const doc = new jsPDF();
     const tableData = rows.map((row) =>
@@ -152,6 +154,7 @@ const CustomerTable = ({ data }: { data: Customers[] }) => {
     columns,
     data,
     enableRowSelection: true,
+    initialState: { density: "xs" },
     columnFilterDisplayMode: "popover",
     paginationDisplayMode: "pages",
     positionToolbarAlertBanner: "bottom",
@@ -202,7 +205,11 @@ const CustomerTable = ({ data }: { data: Customers[] }) => {
     ),
   });
 
-  return <MantineReactTable table={table} />;
+  return (
+    <MantineProvider theme={{ colorScheme: preferredColorScheme }}>
+      <MantineReactTable table={table} />
+    </MantineProvider>
+  );
 };
 
 export default CustomerTable;

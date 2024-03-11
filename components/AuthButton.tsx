@@ -11,10 +11,15 @@ export default async function AuthButton() {
   } = await supabase.auth.getUser();
 
   return user ? (
-    <div className="flex items-center gap-4 text-foreground">
-      <p className="text-sm">Hey, {user.email}!</p>
-      <form action="/api/auth/signout" method="post">
-        <Button variant="default">Logout</Button>
+    <div className="flex items-center gap-4 text-foreground-muted">
+      <p className="text-sm pt-8 text-slate-600">Hey, {user.email}!</p>
+      <form className="pt-8" action="/api/auth/signout" method="post">
+        <Button
+          variant="default"
+          className="bg-red-600 text-background hover:bg-red-500"
+        >
+          Logout
+        </Button>
       </form>
     </div>
   ) : (

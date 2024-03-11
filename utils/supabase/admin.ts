@@ -28,23 +28,23 @@ const supabaseAdmin = createClient<Database>(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-const upsertProductRecord = async (product: Stripe.Product) => {
-  const productData: Product = {
-    id: product.id,
-    active: product.active,
-    name: product.name,
-    description: product.description ?? null,
-    image: product.images?.[0] ?? null,
-    metadata: product.metadata,
-  };
+// const upsertProductRecord = async (product: Stripe.Product) => {
+//   const productData: Product = {
+//     id: product.id,
+//     active: product.active,
+//     name: product.name,
+//     description: product.description ?? null,
+//     image: product.images?.[0] ?? null,
+//     metadata: product.metadata,
+//   };
 
-  const { error: upsertError } = await supabaseAdmin
-    .from("products")
-    .upsert([productData]);
-  if (upsertError)
-    throw new Error(`Product insert/update failed: ${upsertError.message}`);
-  console.log(`Product inserted/updated: ${product.id}`);
-};
+//   const { error: upsertError } = await supabaseAdmin
+//     .from("products")
+//     .upsert([productData]);
+//   if (upsertError)
+//     throw new Error(`Product insert/update failed: ${upsertError.message}`);
+//   console.log(`Product inserted/updated: ${product.id}`);
+// };
 
 const upsertJobRecord = async (job: InsertJob) => {
   const jobData: InsertJob = {
@@ -65,7 +65,6 @@ const upsertJobRecord = async (job: InsertJob) => {
     .upsert(jobData);
   if (upsertError)
     throw new Error(`Job insert/update failed: ${upsertError.message}`);
-  console.log(`Job inserted/updated: ${jobs!}`);
 };
 
 const upsertJobFromStripe = async (invoice: Stripe.Invoice) => {
@@ -90,6 +89,7 @@ const upsertJobFromStripe = async (invoice: Stripe.Invoice) => {
       return {
         id: line.price!.product,
         quantity: line.quantity,
+        price_id: line.price!.id,
         // Adjust the property names accordingly based on your data structure
       };
     });
@@ -413,7 +413,7 @@ const manageSubscriptionStatusChange = async (
 };
 
 export {
-  upsertProductRecord,
+  // upsertProductRecord,
   upsertPriceRecord,
   deleteProductRecord,
   deletePriceRecord,

@@ -157,7 +157,6 @@ export async function createCustomerInvoice(customer: any) {
   };
 
   const invoice = await stripe.invoices.create(updatedCustomer);
-  console.log(invoice);
   if (!!invoice) {
     return invoice.id;
   }
@@ -177,7 +176,6 @@ export async function createCustomerLineItem(
     };
     const invoiceItem = await stripe.invoiceItems.create(lineItem);
   });
-  console.log(lineItems);
   if (!!lineItems) {
     return JSON.parse(JSON.stringify(lineItems));
   }

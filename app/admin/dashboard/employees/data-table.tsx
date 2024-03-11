@@ -6,7 +6,7 @@ import {
   type MRT_ColumnDef,
   type MRT_Row,
 } from "mantine-react-table";
-import { Box, Button } from "@mantine/core";
+import { Box, Button, MantineProvider } from "@mantine/core";
 import { IconDownload } from "@tabler/icons-react";
 import { jsPDF } from "jspdf"; //or use your library of choice here
 import autoTable from "jspdf-autotable";
@@ -23,6 +23,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import { useColorScheme } from "@mantine/hooks";
+import balanceFormat from "@/components/balanceFormat";
 
 type Employees = Tables<"users">;
 
@@ -30,13 +32,13 @@ const columns: MRT_ColumnDef<Employees>[] = [
   {
     accessorKey: "id",
     header: "Id",
-    size: 120,
+    size: 80,
     Cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
   },
   {
     accessorKey: "full_name",
     header: "Name",
-    size: 120,
+    size: 80,
     Cell: ({ row }) => (
       <div className="capitalize">{row.getValue("full_name")}</div>
     ),
@@ -44,41 +46,94 @@ const columns: MRT_ColumnDef<Employees>[] = [
   {
     accessorKey: "email",
     header: "Email",
-    size: 120,
+    size: 80,
     Cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
   },
   {
     accessorKey: "work_location",
     header: "Work Location",
-    size: 120,
+    size: 80,
     Cell: ({ row }) => {
       return <div className="capitalize">{row.getValue("work_location")}</div>;
+    },
+  },
+  {
+    accessorKey: "job_role",
+    header: "Job Role",
+    size: 80,
+    Cell: ({ row }) => {
+      return <div className="capitalize">{row.getValue("job_role")}</div>;
+    },
+  },
+  {
+    accessorKey: "salary",
+    header: "Salary",
+    size: 80,
+    Cell: ({ row }) => {
+      return <div className="">{balanceFormat(row.getValue("salary"))}</div>;
+    },
+  },
+  {
+    accessorKey: "address",
+    header: "Address",
+    size: 120,
+    Cell: ({ row }) => {
+      const { city, line1, line2, state, country, postal_code } =
+        row.original.address || {};
+      const addressString = `${line1}${line1 && line2 ? ", " : ""}${line2}${
+        line1 && city ? ", " : ""
+      }${city}${city && state ? ", " : ""}${state}${
+        (line1 || city || state) && postal_code ? " " : ""
+      }${postal_code}`;
+      return <div>{addressString}</div>;
     },
   },
 ];
 
 const EmployeeTable = ({ data }: { data: Employees[] }) => {
+  const preferredColorScheme = useColorScheme();
   const handleExportRows = (rows: MRT_Row<Employees>[]) => {
     const doc = new jsPDF();
     const tableData = rows.map((row) =>
       columns
         .filter((column) => column.accessorKey !== "avatar_url")
-        .map((column) => row.original[column.accessorKey as keyof Employees])
+        .map((column) => {
+          if (column.accessorKey === "address") {
+            const { city, line1, line2, state, country, postal_code } =
+              row.original.address || {};
+            return `${line1}${line1 && line2 ? ", " : ""}${line2}${
+              line1 && city ? ", " : ""
+            }${city}${city && state ? ", " : ""}${state}${
+              (line1 || city || state) && postal_code ? " " : ""
+            }${postal_code}`;
+          }
+          if (column.accessorKey === "salary") {
+            return balanceFormat(row.original.salary?.toString() || "0");
+          }
+          return row.original[column.accessorKey as keyof Employees];
+        })
     );
     const tableHeaders = columns.map((c) => c.header);
 
     autoTable(doc, {
       head: [tableHeaders],
       body: tableData,
+
+      styles: {
+        overflow: "linebreak",
+        fontSize: 6, // Adjust the font size
+      },
+      showHead: "everyPage",
     });
 
-    doc.save("mrt-pdf-example.pdf");
+    doc.save("HRS-Employees.pdf");
   };
 
   const table = useMantineReactTable({
     columns,
     data,
     enableRowSelection: true,
+    initialState: { density: "xs" },
     columnFilterDisplayMode: "popover",
     paginationDisplayMode: "pages",
     positionToolbarAlertBanner: "bottom",
@@ -129,7 +184,11 @@ const EmployeeTable = ({ data }: { data: Employees[] }) => {
     ),
   });
 
-  return <MantineReactTable table={table} />;
+  return (
+    <MantineProvider theme={{ colorScheme: preferredColorScheme }}>
+      <MantineReactTable table={table} />
+    </MantineProvider>
+  );
 };
 
 export default EmployeeTable;

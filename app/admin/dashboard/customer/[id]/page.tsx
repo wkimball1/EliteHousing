@@ -207,14 +207,19 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
 
   const handleSubmit = async () => {
     const newJob = supabaseJob!;
+    console.log("tableData:", tableData);
     newJob.products = tableData.map((data) => {
-      const container = { id: data.id, quantity: data.quantity };
+      const container = {
+        id: data.id,
+        quantity: data.quantity,
+        price_id: data.price_id,
+      };
       return container;
     });
     newJob.customer = supabaseCustomer![0].id;
     newJob.employee = invoiceData.metadata.employee;
     newJob.address = billing;
-    console.log(newJob);
+    console.log("newJob", newJob);
     const invoiceId = await createCustomerInvoice(invoiceData);
     const InvoiceItem = await createCustomerLineItem(
       invoiceId,
