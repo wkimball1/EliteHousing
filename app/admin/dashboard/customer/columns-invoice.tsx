@@ -32,6 +32,8 @@ import Link from "next/link";
 import InvoiceDialog from "./[id]/InvoiceDialog";
 import { Dialog } from "@/components/ui/dialog";
 import { useColorScheme } from "@mantine/hooks";
+import { useRouter } from "next/navigation";
+import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 
 const TimestampConverter = (timestamp: any) => {
   // Convert Unix timestamp to milliseconds
@@ -65,11 +67,6 @@ const getColorClass = (status: string) => {
 };
 
 const columns: MRT_ColumnDef<Invoice>[] = [
-  {
-    accessorKey: "select",
-    header: "select",
-    size: 40,
-  },
   {
     accessorKey: "amount_due",
     header: "Amount Due",
@@ -112,7 +109,71 @@ const columns: MRT_ColumnDef<Invoice>[] = [
       </div>
     ),
   },
-  { accessorKey: "actions", header: "Actions", size: 40 },
+  {
+    accessorKey: "actions",
+    header: "Actions",
+    size: 40,
+    Cell: ({ row }) => {
+      const invoice: any = row.original;
+      console.log("Invoice:", invoice);
+      const router = useRouter();
+      return (
+        <Dialog>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="default" className="h-8 w-8 p-0 bg-background">
+                <span className="sr-only">Open menu</span>
+                <DotsHorizontalIcon className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              className="bg-background flex flex-col items-center text-sm"
+            >
+              <InvoiceDialog invoice={invoice} />
+              <Link
+                href={
+                  !!invoice && !!invoice.invoice_pdf ? invoice.invoice_pdf : ""
+                }
+                rel="noopener noreferrer"
+                target="_blank"
+                className={
+                  !!invoice && !!invoice.invoice_pdf
+                    ? " "
+                    : "pointer-events-none"
+                }
+                aria-disabled={!invoice || !invoice.invoice_pdf}
+                tabIndex={!invoice || !invoice.invoice_pdf ? -1 : undefined}
+              >
+                View Invoice
+              </Link>
+              <DropdownMenuSeparator />
+              <Link
+                href={
+                  !!invoice && !!invoice.hosted_invoice_url
+                    ? invoice.hosted_invoice_url
+                    : ""
+                }
+                rel="noopener noreferrer"
+                target="_blank"
+                className={
+                  !!invoice && !!invoice.hosted_invoice_url
+                    ? " "
+                    : "pointer-events-none"
+                }
+                aria-disabled={!invoice || !invoice.hosted_invoice_url}
+                tabIndex={
+                  !invoice || !invoice.hosted_invoice_url ? -1 : undefined
+                }
+              >
+                Pay Invoice
+              </Link>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </Dialog>
+      );
+    },
+  },
 ];
 
 const InvoiceTable = ({ data }: { data: Invoice[] }) => {
