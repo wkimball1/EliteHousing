@@ -1,5 +1,10 @@
 "use client";
-import { usePathname, useSearchParams } from "next/navigation";
+import {
+  redirect,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import {
@@ -130,6 +135,8 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
     },
   ]);
 
+  const router = useRouter();
+
   const addRow = () => {
     setTableData((prevData) => [
       ...prevData,
@@ -228,6 +235,17 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
     );
     newJob.invoice_id = invoiceId;
     const jobs = await supabaseServer(newJob);
+    setTableData([
+      {
+        id: "",
+        item: "New Item",
+        description: "",
+        price: 0,
+        quantity: 1,
+        open: false,
+        price_id: "",
+      },
+    ]);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
