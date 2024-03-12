@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import AuthButton from "@/components/AuthButton";
 import NavBar from "@/components/NavBar";
 
-export default function LoginPage({
+export default async function LoginPage({
   searchParams,
 }: {
   searchParams: { message: string };
@@ -39,9 +39,7 @@ export default function LoginPage({
 
     return redirect("/admin/dashboard");
   };
-
-  checkLoggedIn;
-
+  await checkLoggedIn();
   return (
     <div className="flex-1 flex flex-col w-full">
       <NavBar />
