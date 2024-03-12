@@ -4,12 +4,14 @@ import {
   type MRT_ColumnDef,
   type MRT_Row,
 } from "mantine-react-table";
+import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css"; //if using mantine date picker features
+import "mantine-react-table/styles.css";
 import { Box, Button, MantineProvider, useMantineTheme } from "@mantine/core";
 import { IconDownload } from "@tabler/icons-react";
 import { jsPDF } from "jspdf"; //or use your library of choice here
 import autoTable from "jspdf-autotable";
 import { Tables } from "@/types_db";
-import { useColorScheme } from "@mantine/hooks";
 import { useState } from "react";
 
 type Jobs = Tables<"jobs">;
@@ -79,7 +81,6 @@ const columns: MRT_ColumnDef<Jobs>[] = [
 ];
 
 const JobsTable = ({ data }: { data: Jobs[] }) => {
-  const preferredColorScheme = useColorScheme();
   const handleExportRows = (rows: MRT_Row<Jobs>[]) => {
     const doc = new jsPDF({ orientation: "landscape" });
     const tableData: string[][] = rows.map((row) => {
@@ -153,7 +154,7 @@ const JobsTable = ({ data }: { data: Jobs[] }) => {
       showHead: "everyPage",
     });
 
-    doc.save("jobs.pdf");
+    doc.save("HRS-Jobs.pdf");
   };
 
   const table = useMantineReactTable({
@@ -166,7 +167,7 @@ const JobsTable = ({ data }: { data: Jobs[] }) => {
     positionToolbarAlertBanner: "bottom",
     renderTopToolbarCustomActions: ({ table }) => (
       <Box
-        sx={{
+        style={{
           display: "flex",
           gap: "16px",
           padding: "8px",
@@ -181,7 +182,7 @@ const JobsTable = ({ data }: { data: Jobs[] }) => {
           onClick={() =>
             handleExportRows(table.getPrePaginationRowModel().rows)
           }
-          leftIcon={<IconDownload />}
+          leftSection={<IconDownload />}
         >
           Export All Rows
         </Button>
@@ -191,7 +192,7 @@ const JobsTable = ({ data }: { data: Jobs[] }) => {
           disabled={table.getRowModel().rows.length === 0}
           //export all rows as seen on the screen (respects pagination, sorting, filtering, etc.)
           onClick={() => handleExportRows(table.getRowModel().rows)}
-          leftIcon={<IconDownload />}
+          leftSection={<IconDownload />}
         >
           Export Page Rows
         </Button>
@@ -203,7 +204,7 @@ const JobsTable = ({ data }: { data: Jobs[] }) => {
           }
           //only export selected rows
           onClick={() => handleExportRows(table.getSelectedRowModel().rows)}
-          leftIcon={<IconDownload />}
+          leftSection={<IconDownload />}
         >
           Export Selected Rows
         </Button>
@@ -211,11 +212,7 @@ const JobsTable = ({ data }: { data: Jobs[] }) => {
     ),
   });
 
-  return (
-    <MantineProvider theme={{ colorScheme: preferredColorScheme }}>
-      <MantineReactTable table={table} />
-    </MantineProvider>
-  );
+  return <MantineReactTable table={table} />;
 };
 
 export default JobsTable;

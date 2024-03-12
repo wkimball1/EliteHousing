@@ -14,7 +14,6 @@ async function getData(): Promise<Customer[]> {
 
 export default async function CustomersPage() {
   const data = await getData();
-  console.log(data);
 
   return (
     <div className="flex flex-col w-full max-w-full justify-start items-center py-4 px-2">

@@ -22,7 +22,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="w-full flex flex-1 flex-col">
+    <div className="flex flex-col w-full flex-1 bg-background items-center justify-start gap-8 pt-10 pb-4 md:pt-14 md:pb-6 px-4">
       <div className="flex md:py-10 justify-center items-center">
         <h2 className="text-lg md:text-2xl font-bold">
           Schedule your free consultation today!

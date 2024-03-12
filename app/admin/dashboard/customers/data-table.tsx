@@ -1,6 +1,8 @@
 "use client";
 import * as React from "react";
-
+import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css"; //if using mantine date picker features
+import "mantine-react-table/styles.css";
 import {
   MantineReactTable,
   useMantineReactTable,
@@ -24,7 +26,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
-import { useColorScheme } from "@mantine/hooks";
 
 type Customers = Tables<"customers">;
 
@@ -118,7 +119,6 @@ const columns: MRT_ColumnDef<Customers>[] = [
 ];
 
 const CustomerTable = ({ data }: { data: Customers[] }) => {
-  const preferredColorScheme = useColorScheme();
   const handleExportRows = (rows: MRT_Row<Customers>[]) => {
     const doc = new jsPDF();
     const tableData = rows.map((row) =>
@@ -147,7 +147,7 @@ const CustomerTable = ({ data }: { data: Customers[] }) => {
       body: tableData,
     });
 
-    doc.save("mrt-pdf-example.pdf");
+    doc.save("HRS-Customers.pdf");
   };
 
   const table = useMantineReactTable({
@@ -160,7 +160,7 @@ const CustomerTable = ({ data }: { data: Customers[] }) => {
     positionToolbarAlertBanner: "bottom",
     renderTopToolbarCustomActions: ({ table }) => (
       <Box
-        sx={{
+        style={{
           display: "flex",
           gap: "16px",
           padding: "8px",
@@ -175,7 +175,7 @@ const CustomerTable = ({ data }: { data: Customers[] }) => {
           onClick={() =>
             handleExportRows(table.getPrePaginationRowModel().rows)
           }
-          leftIcon={<IconDownload />}
+          leftSection={<IconDownload />}
         >
           Export All Rows
         </Button>
@@ -185,7 +185,7 @@ const CustomerTable = ({ data }: { data: Customers[] }) => {
           disabled={table.getRowModel().rows.length === 0}
           //export all rows as seen on the screen (respects pagination, sorting, filtering, etc.)
           onClick={() => handleExportRows(table.getRowModel().rows)}
-          leftIcon={<IconDownload />}
+          leftSection={<IconDownload />}
         >
           Export Page Rows
         </Button>
@@ -197,7 +197,7 @@ const CustomerTable = ({ data }: { data: Customers[] }) => {
           }
           //only export selected rows
           onClick={() => handleExportRows(table.getSelectedRowModel().rows)}
-          leftIcon={<IconDownload />}
+          leftSection={<IconDownload />}
         >
           Export Selected Rows
         </Button>
@@ -206,7 +206,7 @@ const CustomerTable = ({ data }: { data: Customers[] }) => {
   });
 
   return (
-    <MantineProvider theme={{ colorScheme: preferredColorScheme }}>
+    <MantineProvider defaultColorScheme="auto">
       <MantineReactTable table={table} />
     </MantineProvider>
   );

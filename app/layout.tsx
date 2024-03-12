@@ -3,12 +3,16 @@ import "./globals.css";
 import { Inter as FontSans } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+
 import { Toaster } from "@/components/ui/toaster";
 import { Analytics } from "@vercel/analytics/react";
 
 import { cn } from "../lib/utils";
 import Loading from "./admin/dashboard/loading";
 import { Suspense } from "react";
+import "@mantine/core/styles.css";
+
+import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -32,6 +36,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={GeistSans.className} suppressHydrationWarning>
+      <head>
+        <ColorSchemeScript defaultColorScheme="auto" />
+      </head>
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
@@ -46,7 +53,9 @@ export default function RootLayout({
         >
           <Suspense fallback={<Loading />}>
             <main className="min-h-screen w-full max-w-full flex flex-col">
-              {children}
+              <MantineProvider defaultColorScheme="auto">
+                {children}
+              </MantineProvider>
             </main>
           </Suspense>
           <Toaster />

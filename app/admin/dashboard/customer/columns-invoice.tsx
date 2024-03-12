@@ -1,12 +1,14 @@
 import * as React from "react";
-
+import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css"; //if using mantine date picker features
+import "mantine-react-table/styles.css";
 import {
   MantineReactTable,
   useMantineReactTable,
   type MRT_ColumnDef,
   type MRT_Row,
 } from "mantine-react-table";
-import { Box, Button, MantineProvider } from "@mantine/core";
+
 import { IconDownload } from "@tabler/icons-react";
 import { jsPDF } from "jspdf"; //or use your library of choice here
 import autoTable from "jspdf-autotable";
@@ -31,9 +33,10 @@ import balanceFormat from "@/components/balanceFormat";
 import Link from "next/link";
 import InvoiceDialog from "./[id]/InvoiceDialog";
 import { Dialog } from "@/components/ui/dialog";
-import { useColorScheme } from "@mantine/hooks";
+
 import { useRouter } from "next/navigation";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import { Box, Button, MantineProvider } from "@mantine/core";
 
 const TimestampConverter = (timestamp: any) => {
   // Convert Unix timestamp to milliseconds
@@ -177,7 +180,6 @@ const columns: MRT_ColumnDef<Invoice>[] = [
 ];
 
 const InvoiceTable = ({ data }: { data: Invoice[] }) => {
-  const preferredColorScheme = useColorScheme();
   const handleExportRows = (rows: MRT_Row<Invoice>[]) => {
     const doc = new jsPDF();
     const tableData = rows.map((row) => Object.values(row.original));
@@ -188,7 +190,7 @@ const InvoiceTable = ({ data }: { data: Invoice[] }) => {
       body: tableData,
     });
 
-    doc.save("mrt-pdf-example.pdf");
+    doc.save("HRS-Customer.pdf");
   };
 
   const table = useMantineReactTable({
@@ -200,7 +202,7 @@ const InvoiceTable = ({ data }: { data: Invoice[] }) => {
     positionToolbarAlertBanner: "bottom",
     renderTopToolbarCustomActions: ({ table }) => (
       <Box
-        sx={{
+        style={{
           display: "flex",
           gap: "16px",
           padding: "8px",
@@ -215,7 +217,7 @@ const InvoiceTable = ({ data }: { data: Invoice[] }) => {
           onClick={() =>
             handleExportRows(table.getPrePaginationRowModel().rows)
           }
-          leftIcon={<IconDownload />}
+          leftSection={<IconDownload />}
         >
           Export All Rows
         </Button>
@@ -225,7 +227,7 @@ const InvoiceTable = ({ data }: { data: Invoice[] }) => {
           disabled={table.getRowModel().rows.length === 0}
           //export all rows as seen on the screen (respects pagination, sorting, filtering, etc.)
           onClick={() => handleExportRows(table.getRowModel().rows)}
-          leftIcon={<IconDownload />}
+          leftSection={<IconDownload />}
         >
           Export Page Rows
         </Button>
@@ -237,7 +239,7 @@ const InvoiceTable = ({ data }: { data: Invoice[] }) => {
           }
           //only export selected rows
           onClick={() => handleExportRows(table.getSelectedRowModel().rows)}
-          leftIcon={<IconDownload />}
+          leftSection={<IconDownload />}
         >
           Export Selected Rows
         </Button>
@@ -246,7 +248,7 @@ const InvoiceTable = ({ data }: { data: Invoice[] }) => {
   });
 
   return (
-    <MantineProvider theme={{ colorScheme: preferredColorScheme }}>
+    <MantineProvider defaultColorScheme="auto">
       <MantineReactTable table={table} />
     </MantineProvider>
   );
