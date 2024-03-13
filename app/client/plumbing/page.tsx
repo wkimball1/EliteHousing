@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import background from "@/img/cabinet-hero.jpg";
+import background from "@/img/plumbing-hero.jpg";
 import Link from "next/link";
 
 const tableData = [

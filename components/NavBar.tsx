@@ -47,31 +47,32 @@ const mockdata = [
   {
     icon: BiCabinet,
     title: "Cabinets",
-    description: "This Pokémon’s cry is very loud and distracting",
+    description: "Upgrade your space with sleek cabinet designs.",
     link: "/client/cabinets",
   },
   {
     icon: IconFridge,
     title: "Appliances",
-    description: "The fluid of Smeargle’s tail secretions changes",
+    description: "Efficiency meets style with cutting-edge appliances.",
     link: "/client/appliances",
   },
   {
     icon: IconLamp,
     title: "Lighting and Fans",
-    description: "Yanma is capable of seeing 360 degrees without",
+    description: "Illuminate your home with chic lighting solutions.",
     link: "/client/lighting-fans",
   },
   {
     icon: MdOutlineBathtub,
     title: "Kitchen and Bath Plumbing",
-    description: "The shell’s rounded shape and the grooves on its.",
+    description: "Refresh your space with modern plumbing fixtures.",
     link: "/client/plumbing",
   },
   {
     icon: CountertopsOutlinedIcon,
     title: "Countertops and Tile",
-    description: "This Pokémon uses its flying ability to quickly chase",
+    description:
+      "Enhance your home with exquisite countertop and tile options.",
     link: "/client/countertops-tile",
   },
 ];
@@ -106,7 +107,7 @@ export default function NavBar() {
   ));
 
   return (
-    <Box pb={120}>
+    <Box pb={10}>
       <header className={`bg-background ${classes.header}`}>
         <Group justify="space-between" h="100%">
           <Link className="flex justify-start" href="/">
