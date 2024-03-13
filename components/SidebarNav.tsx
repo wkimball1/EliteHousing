@@ -34,7 +34,7 @@ export default function Sidebar() {
           className="drawer-overlay"
         ></label>
         {isSidebarOpen && (
-          <ul className="menu p-4 w-80 min-h-full bg-background text-base-content">
+          <ul className="menu p-2 w-72 min-h-full bg-background text-base-content">
             <li className="user-select-none hover:bg-background focus:bg-background">
               <Link
                 href="/admin/dashboard"
