@@ -91,9 +91,9 @@ const columns: MRT_ColumnDef<Customers>[] = [
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
+            <Button variant="subtle" className="h-8 w-8 p-0">
               <span className="sr-only">Open menu</span>
-              <DotsHorizontalIcon className="h-4 w-4" />
+              <DotsHorizontalIcon className="h-5 w-5" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="bg-background">
