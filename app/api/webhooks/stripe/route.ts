@@ -8,6 +8,7 @@ import {
   deletePriceRecord,
   upsertCustomer,
   upsertJobFromStripe,
+  upsertSale,
 } from "@/utils/supabase/admin";
 
 const relevantEvents = new Set([
