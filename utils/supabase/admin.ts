@@ -17,6 +17,7 @@ type Customer = Tables<"customers">;
 type UpdateJob = JobUpdate;
 type InsertJob = TablesInsert<"jobs">;
 type Job = Tables<"jobs">;
+type Sale = Tables<"sales">;
 
 // Change to control trial period length
 const TRIAL_PERIOD_DAYS = 0;
@@ -153,6 +154,26 @@ const upsertCustomer = async (customer: Stripe.Customer) => {
     );
 
   return customer.id;
+};
+
+const upsertSale = async (payment_intent: Stripe.PaymentIntent) => {
+  const salesData: Sale = {
+    id: payment_intent.id,
+    customer_id: (payment_intent.customer as string) ?? null,
+    amount: payment_intent.amount ?? null,
+    invoice_id: (payment_intent.invoice as string) ?? null,
+  };
+
+  const { error: upsertError } = await supabaseAdmin
+    .from("sales")
+    .upsert([salesData]);
+
+  if (upsertError)
+    throw new Error(
+      `Supabase customer record creation failed: ${upsertError.message}`
+    );
+
+  return payment_intent.id;
 };
 
 const upsertPriceRecord = async (
@@ -415,6 +436,7 @@ const manageSubscriptionStatusChange = async (
 export {
   // upsertProductRecord,
   upsertPriceRecord,
+  upsertSale,
   deleteProductRecord,
   deletePriceRecord,
   createOrRetrieveCustomer,

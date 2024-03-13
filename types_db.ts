@@ -32,6 +32,35 @@ export interface Database {
         };
         Relationships: [];
       };
+      sales: {
+        Row: {
+          id: string;
+          customer_id: string | null;
+          amount: number | null;
+          invoice_id: string | null;
+        };
+        Insert: {
+          id: string;
+          customer_id: string | null;
+          amount: number | null;
+          invoice_id: string | null;
+        };
+        Update: {
+          id: string;
+          customer_id?: string | null;
+          amount?: number | null;
+          invoice_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "sales_customer_id_fkey";
+            columns: ["customer"];
+            isOneToOne: false;
+            referencedRelation: "customer";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       jobs: {
         Row: {
           id: string;

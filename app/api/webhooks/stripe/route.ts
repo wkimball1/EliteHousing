@@ -15,6 +15,7 @@ const relevantEvents = new Set([
   "customer.updated",
   "customer.deleted",
   "invoice.updated",
+  "invoice.paid",
   "invoice.finalized",
   "invoice.voided",
   // "product.created",
@@ -27,6 +28,7 @@ const relevantEvents = new Set([
   "customer.subscription.created",
   "customer.subscription.updated",
   "customer.subscription.deleted",
+  "payment_intent.succeeded",
 ]);
 
 export async function POST(req: Request) {
@@ -48,6 +50,8 @@ export async function POST(req: Request) {
   if (relevantEvents.has(event.type)) {
     try {
       switch (event.type) {
+        case "payment_intent.succeeded":
+          await upsertSale(event.data.object as Stripe.PaymentIntent);
         case "customer.created":
         case "customer.updated":
           await upsertCustomer(event.data.object as Stripe.Customer);
@@ -55,6 +59,7 @@ export async function POST(req: Request) {
         case "invoice.updated":
         case "invoice.finalized":
         case "invoice.voided":
+        case "invoice.paid":
           await upsertJobFromStripe(event.data.object as Stripe.Invoice);
           break;
         // case "product.created":
