@@ -53,6 +53,7 @@ export async function POST(req: Request) {
       switch (event.type) {
         case "payment_intent.succeeded":
           await upsertSale(event.data.object as Stripe.PaymentIntent);
+          break;
         case "customer.created":
         case "customer.updated":
           await upsertCustomer(event.data.object as Stripe.Customer);

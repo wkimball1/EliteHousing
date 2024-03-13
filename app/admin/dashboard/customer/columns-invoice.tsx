@@ -118,7 +118,7 @@ const columns: MRT_ColumnDef<Invoice>[] = [
     size: 40,
     Cell: ({ row }) => {
       const invoice: any = row.original;
-      console.log("Invoice:", invoice);
+
       const router = useRouter();
       return (
         <Dialog>
