@@ -35,8 +35,11 @@ export default function Sidebar() {
         ></label>
         {isSidebarOpen && (
           <ul className="menu p-4 w-80 min-h-full bg-background text-base-content">
-            <li>
-              <Link href="/admin/dashboard">
+            <li className="user-select-none hover:bg-background focus:bg-background">
+              <Link
+                href="/admin/dashboard"
+                className="user-select-none hover:bg-background focus:bg-background"
+              >
                 <img
                   src={defaultLogo.src}
                   alt="Company Logo"
