@@ -82,6 +82,7 @@ import { Json, Tables, TablesInsert } from "@/types_db";
 import { Form } from "react-hook-form";
 import { upsertJobRecord } from "@/utils/supabase/admin";
 import { supabaseServer } from "@/components/supabaseServer";
+import { Divider } from "@mantine/core";
 
 type Job = TablesInsert<"jobs">;
 
@@ -465,13 +466,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                         className="col-span-3"
                       />
                     </div>
-                    {/* Table for selecting items */}
 
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label className="text-center col-span-4">
-                        Select Items
-                      </Label>
-                    </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                       <div className="col-span-4">
                         {/* Add your table component here */}
@@ -507,7 +502,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                                     />
                                   </Button>
                                 </TableCell>
-                                <TableCell className="text-center ">
+                                <TableCell className="text-center">
                                   <Popover
                                     open={row.open}
                                     onOpenChange={(newState) => {
@@ -521,13 +516,13 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                                         variant="outline"
                                         role="combobox"
                                         aria-expanded={row.open}
-                                        className="w-[200px] justify-between hover:bg-background"
+                                        className="w-[300px] justify-between hover:bg-background"
                                       >
                                         {value ? row.item : "Select product..."}
                                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                       </Button>
                                     </PopoverTrigger>
-                                    <PopoverContent className="w-[200px] p-0 bg-background max-h-200px overflow-y-auto ">
+                                    <PopoverContent className="w-[300px] p-0 bg-background max-h-200px overflow-y-auto ">
                                       <Command>
                                         <CommandInput placeholder="Search products..." />
                                         <CommandEmpty>

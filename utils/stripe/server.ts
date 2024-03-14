@@ -152,7 +152,7 @@ export async function createCustomerInvoice(customer: any) {
   const updatedCustomer = {
     ...customer,
     collection_method: "send_invoice",
-    auto_advance: true,
+    auto_advance: false,
     days_until_due: 30,
   };
 
@@ -162,6 +162,16 @@ export async function createCustomerInvoice(customer: any) {
   }
   return "";
 }
+
+export async function finalizeInvoice(invoiceId: any) {
+  const invoiceFinal = await stripe.invoices.finalizeInvoice(invoiceId);
+  if (invoiceFinal) {
+    const invoice = await stripe.invoices.sendInvoice(invoiceId);
+    return invoice;
+  }
+  return "";
+}
+
 export async function createCustomerLineItem(
   invoiceId: any,
   tableData: any[],

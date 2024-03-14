@@ -16,7 +16,8 @@ export default function Sidebar() {
 
   return (
     <div
-      className={`w-fit drawer z-20 ${isSidebarOpen ? "lg:drawer-open" : ""}`}
+      className={`w-fit drawer z-50 ${isSidebarOpen ? "lg:drawer-open" : ""}`}
+      style={{ zIndex: 1000 }}
     >
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
       <div className="flex flex-col items-start justify-start lg:hidden">
@@ -34,7 +35,10 @@ export default function Sidebar() {
           className="drawer-overlay"
         ></label>
         {isSidebarOpen && (
-          <ul className="menu p-2 w-72 min-h-full bg-background text-base-content">
+          <ul
+            className="menu p-2 w-72 z-50 min-h-full bg-background text-base-content"
+            style={{ zIndex: 1000 }}
+          >
             <li className="user-select-none hover:bg-background focus:bg-background">
               <Link
                 href="/admin/dashboard"

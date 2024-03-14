@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { type Invoice } from "./[id]/invoiceType";
 
 import { Checkbox } from "@/components/ui/checkbox";
-import { createStripePortal } from "@/utils/stripe/server";
+import { createStripePortal, finalizeInvoice } from "@/utils/stripe/server";
 import handleStripePortalRequest from "@/components/handle-stripe-portal";
 
 import {
@@ -37,6 +37,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { Box, Button, MantineProvider } from "@mantine/core";
+import { Button as ShadButton } from "@/components/ui/button";
 
 const TimestampConverter = (timestamp: any) => {
   // Convert Unix timestamp to milliseconds
@@ -131,45 +132,64 @@ const columns: MRT_ColumnDef<Invoice>[] = [
             <DropdownMenuContent
               align="end"
               className="bg-background flex flex-col items-center text-sm"
+              onClick={(e) => e.stopPropagation()}
             >
               <InvoiceDialog invoice={invoice} />
-              <Link
-                href={
-                  !!invoice && !!invoice.invoice_pdf ? invoice.invoice_pdf : ""
-                }
-                rel="noopener noreferrer"
-                target="_blank"
-                className={
-                  !!invoice && !!invoice.invoice_pdf
-                    ? " "
-                    : "pointer-events-none"
-                }
-                aria-disabled={!invoice || !invoice.invoice_pdf}
-                tabIndex={!invoice || !invoice.invoice_pdf ? -1 : undefined}
-              >
-                View Invoice
-              </Link>
-              <DropdownMenuSeparator />
-              <Link
-                href={
-                  !!invoice && !!invoice.hosted_invoice_url
-                    ? invoice.hosted_invoice_url
-                    : ""
-                }
-                rel="noopener noreferrer"
-                target="_blank"
-                className={
-                  !!invoice && !!invoice.hosted_invoice_url
-                    ? " "
-                    : "pointer-events-none"
-                }
-                aria-disabled={!invoice || !invoice.hosted_invoice_url}
-                tabIndex={
-                  !invoice || !invoice.hosted_invoice_url ? -1 : undefined
-                }
-              >
-                Pay Invoice
-              </Link>
+              {invoice.status === "draft" && (
+                <ShadButton
+                  variant="ghost"
+                  className="font-normal hover:bg-background focus:bg-background pb-2"
+                  onClick={() => {
+                    finalizeInvoice(invoice.id);
+                    window.location.reload();
+                  }}
+                >
+                  Finalize Invoice
+                </ShadButton>
+              )}
+              {invoice.status !== "draft" && (
+                <>
+                  <Link
+                    href={
+                      !!invoice && !!invoice.invoice_pdf
+                        ? invoice.invoice_pdf
+                        : ""
+                    }
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    className={
+                      !!invoice && !!invoice.invoice_pdf
+                        ? ""
+                        : "pointer-events-none"
+                    }
+                    aria-disabled={!invoice || !invoice.invoice_pdf}
+                    tabIndex={!invoice || !invoice.invoice_pdf ? -1 : undefined}
+                  >
+                    View Invoice
+                  </Link>
+                  <DropdownMenuSeparator />
+                  <Link
+                    href={
+                      !!invoice && !!invoice.hosted_invoice_url
+                        ? invoice.hosted_invoice_url
+                        : ""
+                    }
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    className={
+                      !!invoice && !!invoice.hosted_invoice_url
+                        ? ""
+                        : "pointer-events-none"
+                    }
+                    aria-disabled={!invoice || !invoice.hosted_invoice_url}
+                    tabIndex={
+                      !invoice || !invoice.hosted_invoice_url ? -1 : undefined
+                    }
+                  >
+                    Pay Invoice
+                  </Link>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </Dialog>
