@@ -90,7 +90,7 @@ const SalesTable = ({ data }: { data: Sales[] }) => {
       showHead: "everyPage",
     });
 
-    doc.save("HRS-Products.pdf");
+    doc.save("HRS-Sales.pdf");
   };
 
   const table = useMantineReactTable({
