@@ -17,7 +17,7 @@ type Customer = Tables<"customers">;
 type UpdateJob = JobUpdate;
 type InsertJob = TablesInsert<"jobs">;
 type Job = Tables<"jobs">;
-type Sale = Tables<"sales">;
+type Sale = TablesInsert<"sales">;
 
 // Change to control trial period length
 const TRIAL_PERIOD_DAYS = 0;

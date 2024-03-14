@@ -37,18 +37,21 @@ export interface Database {
           id: string;
           customer_id: string | null;
           amount: number | null;
+          created: string | null;
           invoice_id: string | null;
         };
         Insert: {
           id: string;
-          customer_id: string | null;
-          amount: number | null;
-          invoice_id: string | null;
+          customer_id?: string | null;
+          amount?: number | null;
+
+          invoice_id?: string | null;
         };
         Update: {
           id: string;
           customer_id?: string | null;
           amount?: number | null;
+
           invoice_id?: string | null;
         };
         Relationships: [
@@ -173,24 +176,42 @@ export interface Database {
           description: string | null;
           id: string;
           image: string | null;
-          metadata: Json | null;
           name: string | null;
+          quantity_available: number | null;
+          quantity_sold: number | null;
+          cost: number | null;
+          model_number: string | null;
+          serial_number: any[] | null;
+          brand: string | null;
+          metadata: any | null;
         };
         Insert: {
           active?: boolean | null;
           description?: string | null;
           id: string;
           image?: string | null;
-          metadata?: Json | null;
           name?: string | null;
+          quantity_available?: number | null;
+          quantity_sold?: number | null;
+          cost?: number | null;
+          model_number?: string | null;
+          serial_number?: any[] | null;
+          brand?: string | null;
+          metadata?: any | null;
         };
         Update: {
           active?: boolean | null;
           description?: string | null;
-          id?: string;
+          id: string;
           image?: string | null;
-          metadata?: Json | null;
           name?: string | null;
+          quantity_available?: number | null;
+          quantity_sold?: number | null;
+          cost?: number | null;
+          model_number?: string | null;
+          serial_number?: any[] | null;
+          brand?: string | null;
+          metadata?: any | null;
         };
         Relationships: [];
       };

@@ -16,59 +16,53 @@ import { Tables } from "@/types_db";
 import { useState } from "react";
 import balanceFormat from "@/components/balanceFormat";
 
-type Product = {
-  active?: boolean | null;
-  description?: string | null;
-  id?: string;
-  image?: string | null;
-  name?: string | null;
-  price?: number | null;
-  quantity_available?: number | null;
-  quantity_sold?: number | null;
-  cost?: number | null;
-  model_number?: string | null;
-  serial_number?: any[] | null;
-  brand?: string | null;
-  metadata?: any | null;
-};
+type Sales = Tables<"sales">;
 
-const columns: MRT_ColumnDef<Product>[] = [
+const columns: MRT_ColumnDef<Sales>[] = [
   { accessorKey: "id", header: "ID", size: 40 },
   {
-    accessorKey: "active",
-    header: "Active",
+    accessorKey: "customer_id",
+    header: "Customer Id",
     size: 40,
   },
-  { accessorKey: "name", header: "Name", size: 60 },
-  { accessorKey: "description", header: "Description", size: 60 },
   {
-    accessorKey: "price",
-    header: "price",
+    accessorKey: "amount",
+    header: "Amount",
     size: 60,
     Cell: ({ row }) => (
-      <div className="capitalize">{balanceFormat(row.getValue("price"))}</div>
+      <div className="capitalize">{balanceFormat(row.getValue("amount"))}</div>
     ),
   },
   {
-    accessorKey: "cost",
-    header: "Cost",
-    size: 60,
-    Cell: ({ row }) => (
-      <div className="capitalize">{balanceFormat(row.getValue("cost"))}</div>
-    ),
+    accessorKey: "created",
+    header: "Sale Date",
+    size: 150,
+    Cell: ({ row }) => {
+      const currentDate = new Date(row.original.created as string);
+
+      // Create an Intl.DateTimeFormat object for Eastern Time
+      const easternTimeFormatter = new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/New_York", // 'America/New_York' corresponds to Eastern Time
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      });
+
+      // Format the date in Eastern Time
+      const formattedDate = easternTimeFormatter.format(currentDate);
+
+      return <div>{formattedDate}</div>;
+    },
   },
   {
-    accessorKey: "quantity_sold",
-    header: "# Sold",
+    accessorKey: "invoice_id",
+    header: "Invoice Id",
     size: 60,
   },
-  { accessorKey: "quantity_available", header: "# Available", size: 60 },
-  { accessorKey: "model_number", header: "Model #", size: 60 },
-  { accessorKey: "brand", header: "Brand", size: 40 },
 ];
 
-const ProductsTable = ({ data }: { data: any }) => {
-  const handleExportRows = (rows: MRT_Row<Product>[]) => {
+const SalesTable = ({ data }: { data: Sales[] }) => {
+  const handleExportRows = (rows: MRT_Row<Sales>[]) => {
     const doc = new jsPDF();
     const tableData = rows.map((row) => Object.values(row.original));
     const tableHeaders = columns.map((c) => c.header);
@@ -145,4 +139,4 @@ const ProductsTable = ({ data }: { data: any }) => {
   return <MantineReactTable table={table} />;
 };
 
-export default ProductsTable;
+export default SalesTable;
