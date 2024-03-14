@@ -70,7 +70,20 @@ const columns: MRT_ColumnDef<Product>[] = [
 const ProductsTable = ({ data }: { data: any }) => {
   const handleExportRows = (rows: MRT_Row<Product>[]) => {
     const doc = new jsPDF();
-    const tableData = rows.map((row) => Object.values(row.original));
+    console.log(data);
+    const tableData = rows.map((row) =>
+      columns.map((column) => {
+        // Handle the price column separately to format it and set a default value if empty
+        if (column.accessorKey === "price") {
+          const price = row.original.price
+            ? balanceFormat(row.original.price.toString())
+            : "$0.00";
+          return price;
+        } else {
+          return row.original[column.accessorKey as keyof Product];
+        }
+      })
+    );
     const tableHeaders = columns.map((c) => c.header);
 
     autoTable(doc, {

@@ -15,6 +15,18 @@ import autoTable from "jspdf-autotable";
 import { Tables } from "@/types_db";
 import { useState } from "react";
 import balanceFormat from "@/components/balanceFormat";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Dialog } from "@/components/ui/dialog";
+import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import InvoiceDialog from "../customer/[id]/InvoiceDialog";
+import Link from "next/link";
 
 type Sales = Tables<"sales">;
 
