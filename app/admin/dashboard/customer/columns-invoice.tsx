@@ -55,17 +55,17 @@ const TimestampConverter = (timestamp: any) => {
 const getColorClass = (status: string) => {
   switch (status) {
     case "draft":
-      return "bg-slate-100 dark:bg-slate-700";
+      return "blue";
     case "open":
-      return "bg-slate-300 dark:bg-stone-500";
+      return "yellow";
     case "paid":
-      return "bg-green-500";
+      return "teal";
     case "uncollectable":
-      return "bg-red-500";
+      return "orange";
     case "void":
-      return "bg-stone-500";
+      return "grey";
     default:
-      return "bg-background";
+      return "blue";
   }
 };
 
@@ -88,10 +88,9 @@ const columns: MRT_ColumnDef<Invoice>[] = [
       return (
         <div>
           <Button
-            variant="ghost"
-            className={`capitalize enabled:pointer-events-none ${getColorClass(
-              row.getValue("status")
-            )}`}
+            variant="filled"
+            className="capitalize enabled:pointer-events-none"
+            color={getColorClass(row.getValue("status"))}
           >
             {row.getValue("status")}
           </Button>

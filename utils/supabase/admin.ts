@@ -10,8 +10,10 @@ import type {
   TablesInsert,
   TablesUpdate,
 } from "@/types_db";
+import { Product } from "@/app/admin/dashboard/inventory/page";
 
-type Product = Tables<"products">;
+type Products = TablesInsert<"products">;
+
 type Price = Tables<"prices">;
 type Customer = Tables<"customers">;
 type UpdateJob = JobUpdate;
@@ -66,6 +68,70 @@ const upsertJobRecord = async (job: InsertJob) => {
     .upsert(jobData);
   if (upsertError)
     throw new Error(`Job insert/update failed: ${upsertError.message}`);
+};
+
+const createProduct = async (product: Product) => {
+  const { data: existingProduct, error: selectError } = await supabaseAdmin
+    .from("products")
+    .select("id, quantity_available, serial_number")
+    .eq("model_number", product.model_number as string);
+
+  if (selectError) {
+    throw new Error(`Error selecting existing product: ${selectError.message}`);
+  }
+
+  if (existingProduct && existingProduct.length > 0) {
+    // Product with the same model_number already exists
+    const updatedQuantity = existingProduct[0].quantity_available! + 1;
+    const updatedSerialNumbers = [
+      ...existingProduct[0].serial_number!,
+      product.serial_number!,
+    ];
+
+    const { data: updatedProduct, error: updateError } = await supabaseAdmin
+      .from("products")
+      .update({
+        quantity_available: updatedQuantity,
+        serial_number: updatedSerialNumbers,
+      })
+      .eq("id", existingProduct[0].id);
+
+    if (updateError) {
+      throw new Error(`Error updating product: ${updateError.message}`);
+    }
+
+    console.log(`Product quantity updated: ${existingProduct[0].id}`);
+  } else {
+    const price = await stripe.prices.create({
+      currency: "usd",
+      unit_amount: product.price ?? 0,
+      product_data: {
+        name: product.name ?? "",
+      },
+    });
+    const productData: Products = {
+      id: price.product as string,
+      active: product.active,
+      description: product.description,
+      image: product.image,
+      name: product.name,
+      quantity_available: 1,
+      quantity_sold: 0,
+      cost: product.cost,
+      model_number: product.model_number,
+      serial_number: [product.serial_number],
+      brand: product.brand,
+      metadata: {},
+    };
+    // No existing product found, perform upsert operation
+    const { data: products, error: upsertError } = await supabaseAdmin
+      .from("products")
+      .upsert(productData, { onConflict: "model_number" });
+
+    if (upsertError) {
+      throw new Error(`Product insert/update failed: ${upsertError.message}`);
+    }
+  }
 };
 
 const upsertJobFromStripe = async (invoice: Stripe.Invoice) => {
@@ -436,4 +502,5 @@ export {
   upsertCustomer,
   upsertJobRecord,
   upsertJobFromStripe,
+  createProduct,
 };

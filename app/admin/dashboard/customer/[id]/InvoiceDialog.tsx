@@ -16,7 +16,10 @@ export default function InvoiceDialog(invoice: any) {
     <div>
       <Dialog>
         <DialogTrigger asChild>
-          <Button className="font-normal" variant="ghost">
+          <Button
+            className="font-normal focus:bg-background hover:bg-background"
+            variant="ghost"
+          >
             Edit Invoice
           </Button>
         </DialogTrigger>

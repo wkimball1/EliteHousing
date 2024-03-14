@@ -44,14 +44,12 @@ export interface Database {
           id: string;
           customer_id?: string | null;
           amount?: number | null;
-
           invoice_id?: string | null;
         };
         Update: {
           id: string;
           customer_id?: string | null;
           amount?: number | null;
-
           invoice_id?: string | null;
         };
         Relationships: [
@@ -202,7 +200,7 @@ export interface Database {
         Update: {
           active?: boolean | null;
           description?: string | null;
-          id: string;
+          id?: string;
           image?: string | null;
           name?: string | null;
           quantity_available?: number | null;

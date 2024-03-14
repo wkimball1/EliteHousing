@@ -103,6 +103,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
   const [stripeCustomer, setStripeCustomer] = useState<any | null>(null);
   const [stripeInvoices, setStripeInvoices] = useState<any | null>(null);
   const [value, setValue] = useState("");
+  const [balance, setBalance] = useState(0);
   const [total, setTotal] = useState(0);
   const [billing, setBilling] = useState<any | null>({
     line1: "",
@@ -202,6 +203,19 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
         const stripeCustomerInvoices = await retrieveCustomerInvoices({
           id: custId!,
         });
+        if (stripeCustomerInvoices) {
+          const validInvoices = stripeCustomerInvoices.filter(
+            (invoice: Invoice) =>
+              invoice.status !== "Void" && invoice.status !== "Uncollectable"
+          );
+
+          // Extract amounts due from each valid invoice and sum them up
+          const totalAmountDue = validInvoices.reduce(
+            (total: number, invoice: Invoice) => total + invoice.amount_due,
+            0
+          );
+          setBalance(totalAmountDue);
+        }
         setStripeInvoices(stripeCustomerInvoices);
         console.log(stripeCustomerInvoices);
         setBilling(customer![0].billing_address);
@@ -661,13 +675,11 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
           <div className="flex flex-row gap-4 justify-center items-center">
             <Card className="w-25 h-25 md:w-32 lg:w-60 bg-background ">
               <CardHeader className="items-center text-sm md:text-xl">
-                <CardTitle>Balance</CardTitle>
+                <CardTitle>Amount Due</CardTitle>
               </CardHeader>
               <CardContent className="grid gap-2 items-center justify-center">
                 <p className="text-xs md:text-xl">
-                  {!!stripeCustomer && !!stripeCustomer.balance
-                    ? balanceFormat(stripeCustomer!.balance)
-                    : balanceFormat("0")}
+                  {balanceFormat(balance.toString())}
                 </p>
               </CardContent>
               <CardFooter></CardFooter>

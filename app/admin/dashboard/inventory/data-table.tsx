@@ -43,7 +43,7 @@ const columns: MRT_ColumnDef<Product>[] = [
   { accessorKey: "description", header: "Description", size: 60 },
   {
     accessorKey: "price",
-    header: "price",
+    header: "Price",
     size: 60,
     Cell: ({ row }) => (
       <div className="capitalize">{balanceFormat(row.getValue("price"))}</div>
