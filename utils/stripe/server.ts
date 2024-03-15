@@ -231,12 +231,19 @@ export async function createCustomerInStripe({
   name,
   email,
   address,
+  phone,
 }: {
   name: string;
   email: string;
   address: any;
+  phone: string;
 }) {
-  const customerData = { name: name, email: email, address: address };
+  const customerData = {
+    name: name,
+    email: email,
+    address: address,
+    phone: phone,
+  };
   const newCustomer = await stripe.customers.create(customerData);
   if (!newCustomer) throw new Error("Stripe customer creation failed.");
 
