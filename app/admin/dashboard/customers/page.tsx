@@ -34,13 +34,13 @@ export default function CustomersPage() {
   const [data, setData] = useState<Customer[]>([]);
   const [stripeCustomer, setStripeCustomer] = useState<any | null>({
     name: "",
+    phone: "",
     email: "",
     address: { line1: "", line2: "", city: "", state: "", postal_code: "" },
   });
   const [isLoading, setIsLoading] = useState(true);
 
-  const { name, email, address } = stripeCustomer;
-  const { line1, line2, city, state, postal_code } = address;
+  const { name, phone, email, address } = stripeCustomer;
 
   const supabase = createClient();
   const router = useRouter();
@@ -69,7 +69,7 @@ export default function CustomersPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     const { name, value } = e.target;
-    if (name === "name" || name === "email") {
+    if (name === "name" || name === "email" || name === "phone") {
       setStripeCustomer((prevCustomer: any) => ({
         ...prevCustomer,
         [name]: value,
@@ -117,6 +117,18 @@ export default function CustomersPage() {
                     id="name"
                     name="name"
                     value={name}
+                    onChange={handleChange}
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="phone" className="text-right">
+                    Phone #
+                  </Label>
+                  <Input
+                    id="phone"
+                    name="phone"
+                    value={phone}
                     onChange={handleChange}
                     className="col-span-3"
                   />

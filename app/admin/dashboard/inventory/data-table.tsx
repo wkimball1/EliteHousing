@@ -79,6 +79,11 @@ const ProductsTable = ({ data }: { data: any }) => {
             ? balanceFormat(row.original.price.toString())
             : "$0.00";
           return price;
+        } else if (column.accessorKey === "cost") {
+          const cost = row.original.cost
+            ? balanceFormat(row.original.cost.toString())
+            : "$0.00";
+          return cost;
         } else {
           return row.original[column.accessorKey as keyof Product];
         }

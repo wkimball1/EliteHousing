@@ -208,6 +208,7 @@ const upsertCustomer = async (customer: Stripe.Customer) => {
     billing_address: customer.address ?? null,
     email: customer.email ?? null,
     full_name: customer.name ?? null,
+    phone: customer.phone ?? null,
   };
 
   const { error: upsertError } = await supabaseAdmin

@@ -76,7 +76,30 @@ const columns: MRT_ColumnDef<Sales>[] = [
 const SalesTable = ({ data }: { data: Sales[] }) => {
   const handleExportRows = (rows: MRT_Row<Sales>[]) => {
     const doc = new jsPDF();
-    const tableData = rows.map((row) => Object.values(row.original));
+    const tableData = rows.map((row) =>
+      columns.map((column) => {
+        if (column.accessorKey === "created") {
+          const currentDate = new Date(row.original.created as string);
+
+          // Create an Intl.DateTimeFormat object for Eastern Time
+          const easternTimeFormatter = new Intl.DateTimeFormat("en-US", {
+            timeZone: "America/New_York", // 'America/New_York' corresponds to Eastern Time
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          });
+
+          // Format the date in Eastern Time
+          const formattedDate = easternTimeFormatter.format(currentDate);
+
+          return formattedDate;
+        } else if (column.accessorKey === "amount") {
+          return balanceFormat(row.original.amount?.toString() || "0");
+        } else {
+          return row.original[column.accessorKey as keyof Sales];
+        }
+      })
+    );
     const tableHeaders = columns.map((c) => c.header);
 
     autoTable(doc, {

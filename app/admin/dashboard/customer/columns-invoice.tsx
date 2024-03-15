@@ -201,8 +201,22 @@ const columns: MRT_ColumnDef<Invoice>[] = [
 const InvoiceTable = ({ data }: { data: Invoice[] }) => {
   const handleExportRows = (rows: MRT_Row<Invoice>[]) => {
     const doc = new jsPDF();
-    const tableData = rows.map((row) => Object.values(row.original));
-    const tableHeaders = columns.map((c) => c.header);
+    const tableData = rows.map((row) =>
+      columns
+        .filter((column) => column.accessorKey !== "actions")
+        .map((column) => {
+          if (column.accessorKey === "amount_due") {
+            return balanceFormat(row.original.amount_due?.toString() || "0");
+          }
+          if (column.accessorKey === "due_date") {
+            return TimestampConverter(row.original.due_date);
+          }
+          return row.original[column.accessorKey as keyof Invoice];
+        })
+    );
+    const tableHeaders = columns
+      .map((c) => c.header)
+      .filter((header) => header !== "Actions");
 
     autoTable(doc, {
       head: [tableHeaders],

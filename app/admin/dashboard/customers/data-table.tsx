@@ -44,18 +44,18 @@ type Customers = Tables<"customers">;
 // };
 
 const columns: MRT_ColumnDef<Customers>[] = [
-  { accessorKey: "id", header: "Id", size: 120 },
-  { accessorKey: "full_name", header: "Name", size: 120 },
+  { accessorKey: "id", header: "Id", size: 80 },
+  { accessorKey: "full_name", header: "Name", size: 80 },
   {
     accessorKey: "email",
     header: "Email",
-    size: 120,
+    size: 80,
     Cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
   },
   {
     accessorKey: "billing_address",
     header: "Address",
-    size: 300,
+    size: 120,
     Cell: ({ row }) => {
       const { city, line1, line2, state, country, postal_code } =
         row.original.billing_address || {};
@@ -67,6 +67,7 @@ const columns: MRT_ColumnDef<Customers>[] = [
       return <div>{addressString}</div>;
     },
   },
+  { accessorKey: "phone", header: "Phone #", size: 60 },
   {
     accessorKey: "actions",
     header: "Actions",

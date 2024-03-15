@@ -17,18 +17,21 @@ export interface Database {
           billing_address: any | null;
           email: string | null;
           full_name: string | null;
+          phone: string | null;
         };
         Insert: {
           id: string;
           billing_address?: any | null;
           email?: string | null;
           full_name?: string | null;
+          phone?: string | null;
         };
         Update: {
           id?: string;
           billing_address?: any | null;
           email?: string | null;
           full_name?: string | null;
+          phone?: string | null;
         };
         Relationships: [];
       };
