@@ -212,7 +212,8 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
 
           // Extract amounts due from each valid invoice and sum them up
           const totalAmountDue = validInvoices.reduce(
-            (total: number, invoice: Invoice) => total + invoice.amount_due,
+            (total: number, invoice: Invoice) =>
+              total + invoice.amount_remaining,
             0
           );
           setBalance(totalAmountDue);

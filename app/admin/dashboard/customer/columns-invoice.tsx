@@ -72,12 +72,12 @@ const getColorClass = (status: string) => {
 
 const columns: MRT_ColumnDef<Invoice>[] = [
   {
-    accessorKey: "amount_due",
+    accessorKey: "amount_remaining",
     header: "Amount Due",
     size: 120,
     Cell: ({ row }) => (
       <div className="capitalize">
-        {balanceFormat(row.getValue("amount_due"))}
+        {balanceFormat(row.getValue("amount_remaining"))}
       </div>
     ),
   },
@@ -205,8 +205,10 @@ const InvoiceTable = ({ data }: { data: Invoice[] }) => {
       columns
         .filter((column) => column.accessorKey !== "actions")
         .map((column) => {
-          if (column.accessorKey === "amount_due") {
-            return balanceFormat(row.original.amount_due?.toString() || "0");
+          if (column.accessorKey === "amount_remaining") {
+            return balanceFormat(
+              row.original.amount_remaining?.toString() || "0"
+            );
           }
           if (column.accessorKey === "due_date") {
             return TimestampConverter(row.original.due_date);

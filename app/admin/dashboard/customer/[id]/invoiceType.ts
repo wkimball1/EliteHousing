@@ -4,4 +4,5 @@ export type Invoice = {
   status: string;
   id: string;
   due_date: string;
+  amount_remaining: number;
 };

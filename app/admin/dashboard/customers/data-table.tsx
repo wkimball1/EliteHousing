@@ -50,7 +50,9 @@ const columns: MRT_ColumnDef<Customers>[] = [
     accessorKey: "email",
     header: "Email",
     size: 80,
-    Cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+    Cell: ({ renderedCellValue }) => (
+      <div className="lowercase">{renderedCellValue}</div>
+    ),
   },
   {
     accessorKey: "billing_address",
