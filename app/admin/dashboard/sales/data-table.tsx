@@ -46,8 +46,10 @@ const columns: MRT_ColumnDef<Sales>[] = [
     ),
   },
   {
-    accessorKey: "created",
+    accessorFn: (originalRow) => new Date(originalRow.created as string),
+    id: "created",
     header: "Sale Date",
+    filterVariant: "date-range",
     size: 150,
     Cell: ({ row }) => {
       const currentDate = new Date(row.original.created as string);
@@ -55,9 +57,9 @@ const columns: MRT_ColumnDef<Sales>[] = [
       // Create an Intl.DateTimeFormat object for Eastern Time
       const easternTimeFormatter = new Intl.DateTimeFormat("en-US", {
         timeZone: "America/New_York", // 'America/New_York' corresponds to Eastern Time
-        year: "numeric",
-        month: "2-digit",
+        month: "long",
         day: "2-digit",
+        year: "numeric",
       });
 
       // Format the date in Eastern Time
@@ -78,15 +80,15 @@ const SalesTable = ({ data }: { data: Sales[] }) => {
     const doc = new jsPDF();
     const tableData = rows.map((row) =>
       columns.map((column) => {
-        if (column.accessorKey === "created") {
+        if (column.id === "created") {
           const currentDate = new Date(row.original.created as string);
 
           // Create an Intl.DateTimeFormat object for Eastern Time
           const easternTimeFormatter = new Intl.DateTimeFormat("en-US", {
             timeZone: "America/New_York", // 'America/New_York' corresponds to Eastern Time
-            year: "numeric",
-            month: "2-digit",
+            month: "long",
             day: "2-digit",
+            year: "numeric",
           });
 
           // Format the date in Eastern Time
@@ -120,9 +122,11 @@ const SalesTable = ({ data }: { data: Sales[] }) => {
     columns,
     data,
     enableRowSelection: true,
-    initialState: { density: "xs" },
-    columnFilterDisplayMode: "popover",
+    initialState: { density: "xs", showColumnFilters: true },
+    columnFilterDisplayMode: "subheader",
+    enableGlobalFilter: false,
     paginationDisplayMode: "pages",
+
     positionToolbarAlertBanner: "bottom",
     renderTopToolbarCustomActions: ({ table }) => (
       <Box

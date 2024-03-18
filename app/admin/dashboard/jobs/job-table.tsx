@@ -20,8 +20,8 @@ const columns: MRT_ColumnDef<Jobs>[] = [
   { accessorKey: "id", header: "ID", size: 120 },
   {
     accessorKey: "created_at",
-    header: "Init Date",
-    size: 150,
+    header: "Start Date",
+    size: 40,
     Cell: ({ row }) => {
       const currentDate = new Date(row.original.created_at);
 
@@ -40,8 +40,22 @@ const columns: MRT_ColumnDef<Jobs>[] = [
     },
   },
   { accessorKey: "invoice_id", header: "Invoice Id", size: 120 },
-  { accessorKey: "is_paid", header: "Paid", size: 40 },
-  { accessorKey: "is_work_done", header: "Complete", size: 40 },
+  {
+    accessorKey: "is_paid",
+    header: "Paid",
+    size: 40,
+    Cell: ({ row }) => (
+      <div className="capitalize">{row.original.is_paid.toString()}</div>
+    ),
+  },
+  {
+    accessorKey: "is_work_done",
+    header: "Complete",
+    size: 40,
+    Cell: ({ row }) => (
+      <div className="capitalize">{row.original.is_work_done.toString()}</div>
+    ),
+  },
   {
     accessorKey: "work_completed_date",
     header: "Job Completion Date",
@@ -161,9 +175,10 @@ const JobsTable = ({ data }: { data: Jobs[] }) => {
     columns,
     data,
     enableRowSelection: true,
-    initialState: { density: "xs" },
-    columnFilterDisplayMode: "popover",
+    initialState: { density: "xs", showColumnFilters: true },
+    columnFilterDisplayMode: "subheader",
     paginationDisplayMode: "pages",
+    enableGlobalFilter: false,
     positionToolbarAlertBanner: "bottom",
     renderTopToolbarCustomActions: ({ table }) => (
       <Box

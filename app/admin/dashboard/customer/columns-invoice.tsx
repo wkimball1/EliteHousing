@@ -44,13 +44,14 @@ const TimestampConverter = (timestamp: any) => {
   const date = new Date(timestamp * 1000);
 
   // Get month and day
-  const month = new Intl.DateTimeFormat("en-US", { month: "long" }).format(
-    date
-  );
-  const day = date.getDate();
+  const myDate = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    day: "2-digit",
+    year: "numeric",
+  }).format(date);
 
   // Construct the formatted string
-  return `${month} ${day}`;
+  return myDate;
 };
 
 const getColorClass = (status: string) => {
@@ -78,6 +79,16 @@ const columns: MRT_ColumnDef<Invoice>[] = [
     Cell: ({ row }) => (
       <div className="capitalize">
         {balanceFormat(row.getValue("amount_remaining"))}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "amount_paid",
+    header: "Amount Paid",
+    size: 120,
+    Cell: ({ row }) => (
+      <div className="capitalize">
+        {balanceFormat(row.getValue("amount_paid"))}
       </div>
     ),
   },
@@ -209,6 +220,9 @@ const InvoiceTable = ({ data }: { data: Invoice[] }) => {
             return balanceFormat(
               row.original.amount_remaining?.toString() || "0"
             );
+          }
+          if (column.accessorKey === "amount_paid") {
+            return balanceFormat(row.original.amount_paid?.toString() || "0");
           }
           if (column.accessorKey === "due_date") {
             return TimestampConverter(row.original.due_date);

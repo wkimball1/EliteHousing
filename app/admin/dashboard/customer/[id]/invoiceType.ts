@@ -1,4 +1,5 @@
 export type Invoice = {
+  amount_paid: number;
   select: number;
   amount_due: number;
   status: string;

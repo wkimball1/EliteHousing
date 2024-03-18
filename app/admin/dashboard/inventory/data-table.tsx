@@ -33,11 +33,16 @@ type Product = {
 };
 
 const columns: MRT_ColumnDef<Product>[] = [
-  { accessorKey: "id", header: "ID", size: 40 },
+  { accessorKey: "id", header: "ID", size: 80 },
   {
     accessorKey: "active",
     header: "Active",
     size: 40,
+    Cell: ({ row }) => (
+      <div className="capitalize">
+        {row.original.active?.toString() || false}
+      </div>
+    ),
   },
   { accessorKey: "name", header: "Name", size: 60 },
   { accessorKey: "description", header: "Description", size: 60 },

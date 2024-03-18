@@ -16,7 +16,7 @@ import autoTable from "jspdf-autotable";
 
 import { Tables } from "@/types_db";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,69 +31,83 @@ import balanceFormat from "@/components/balanceFormat";
 
 type Employees = Tables<"users">;
 
-const columns: MRT_ColumnDef<Employees>[] = [
-  {
-    accessorKey: "id",
-    header: "Id",
-    size: 80,
-    Cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
-  },
-  {
-    accessorKey: "full_name",
-    header: "Name",
-    size: 80,
-    Cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("full_name")}</div>
-    ),
-  },
-  {
-    accessorKey: "email",
-    header: "Email",
-    size: 80,
-    Cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
-  },
-  {
-    accessorKey: "work_location",
-    header: "Work Location",
-    size: 80,
-    Cell: ({ row }) => {
-      return <div className="capitalize">{row.getValue("work_location")}</div>;
-    },
-  },
-  {
-    accessorKey: "job_role",
-    header: "Job Role",
-    size: 80,
-    Cell: ({ row }) => {
-      return <div className="capitalize">{row.getValue("job_role")}</div>;
-    },
-  },
-  {
-    accessorKey: "salary",
-    header: "Salary",
-    size: 80,
-    Cell: ({ row }) => {
-      return <div className="">{balanceFormat(row.getValue("salary"))}</div>;
-    },
-  },
-  {
-    accessorKey: "address",
-    header: "Address",
-    size: 120,
-    Cell: ({ row }) => {
-      const { city, line1, line2, state, country, postal_code } =
-        row.original.address || {};
-      const addressString = `${line1}${line1 && line2 ? ", " : ""}${line2}${
-        line1 && city ? ", " : ""
-      }${city}${city && state ? ", " : ""}${state}${
-        (line1 || city || state) && postal_code ? " " : ""
-      }${postal_code}`;
-      return <div>{addressString}</div>;
-    },
-  },
-];
-
 const EmployeeTable = ({ data }: { data: Employees[] }) => {
+  const columns = useMemo<MRT_ColumnDef<Employees>[]>(
+    () => [
+      {
+        accessorKey: "id",
+        header: "Id",
+        size: 80,
+        Cell: ({ row }) => (
+          <div className="capitalize">{row.getValue("id")}</div>
+        ),
+      },
+      {
+        accessorKey: "full_name",
+        header: "Name",
+        size: 80,
+        Cell: ({ row }) => (
+          <div className="capitalize">{row.getValue("full_name")}</div>
+        ),
+      },
+      {
+        accessorKey: "email",
+        header: "Email",
+        size: 80,
+        Cell: ({ row }) => (
+          <div className="lowercase">{row.getValue("email")}</div>
+        ),
+      },
+      {
+        accessorKey: "work_location",
+        header: "Work Location",
+        size: 80,
+        Cell: ({ row }) => {
+          return (
+            <div className="capitalize">{row.getValue("work_location")}</div>
+          );
+        },
+      },
+      {
+        accessorKey: "job_role",
+        header: "Job Role",
+        size: 80,
+        Cell: ({ row }) => {
+          return <div className="capitalize">{row.getValue("job_role")}</div>;
+        },
+      },
+      {
+        accessorFn: (originalRow) => originalRow.salary! / 100 || 0,
+        id: "salary",
+        header: "Salary",
+        // default (or between)
+
+        Cell: ({ cell }) =>
+          cell.getValue<number>().toLocaleString("en-US", {
+            style: "currency",
+            currency: "USD",
+          }),
+        filterFn: "between",
+      },
+      {
+        accessorKey: "address",
+        header: "Address",
+        size: 120,
+        Cell: ({ row }) => {
+          const { city, line1, line2, state, country, postal_code } =
+            row.original.address || {};
+          const addressString = `${line1}${line1 && line2 ? ", " : ""}${line2}${
+            line1 && city ? ", " : ""
+          }${city}${city && state ? ", " : ""}${state}${
+            (line1 || city || state) && postal_code ? " " : ""
+          }${postal_code}`;
+          return <div>{addressString}</div>;
+        },
+      },
+    ],
+    []
+  );
+
   const handleExportRows = (rows: MRT_Row<Employees>[]) => {
     const doc = new jsPDF();
     const tableData = rows.map((row) =>
@@ -109,7 +123,7 @@ const EmployeeTable = ({ data }: { data: Employees[] }) => {
               (line1 || city || state) && postal_code ? " " : ""
             }${postal_code}`;
           }
-          if (column.accessorKey === "salary") {
+          if (column.id === "salary") {
             return balanceFormat(row.original.salary?.toString() || "0");
           }
           return row.original[column.accessorKey as keyof Employees];
@@ -135,8 +149,9 @@ const EmployeeTable = ({ data }: { data: Employees[] }) => {
     columns,
     data,
     enableRowSelection: true,
-    initialState: { density: "xs" },
-    columnFilterDisplayMode: "popover",
+    initialState: { density: "xs", showColumnFilters: true },
+    columnFilterDisplayMode: "subheader",
+    enableGlobalFilter: false,
     paginationDisplayMode: "pages",
     positionToolbarAlertBanner: "bottom",
     renderTopToolbarCustomActions: ({ table }) => (

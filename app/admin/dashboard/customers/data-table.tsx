@@ -157,9 +157,10 @@ const CustomerTable = ({ data }: { data: Customers[] }) => {
     columns,
     data,
     enableRowSelection: true,
-    initialState: { density: "xs" },
-    columnFilterDisplayMode: "popover",
+    initialState: { density: "xs", showColumnFilters: true },
+    columnFilterDisplayMode: "subheader",
     paginationDisplayMode: "pages",
+    enableGlobalFilter: false,
     positionToolbarAlertBanner: "bottom",
     renderTopToolbarCustomActions: ({ table }) => (
       <Box

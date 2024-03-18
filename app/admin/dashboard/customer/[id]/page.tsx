@@ -83,6 +83,10 @@ import { Form } from "react-hook-form";
 import { upsertJobRecord } from "@/utils/supabase/admin";
 import { supabaseServer } from "@/components/supabaseServer";
 import { Divider } from "@mantine/core";
+import CustomerDocument from "@/components/CustomerDocument";
+import MyDocument from "@/components/CustomerDocument";
+import { PDFDownloadLink, pdf } from "@react-pdf/renderer";
+import saveAs from "file-saver";
 
 type Job = TablesInsert<"jobs">;
 
@@ -96,6 +100,12 @@ interface TableRow {
   price_id: string;
 }
 
+const downloadPdf = async (customer: any[]) => {
+  const fileName = "customer-statement.pdf";
+  const blob = await pdf(<MyDocument customer={customer} />).toBlob();
+  saveAs(blob, fileName);
+};
+
 export default function CustomerPage({ params }: { params: { id: string } }) {
   const [isLoading, setIsLoading] = useState(true);
   const [supabaseCustomer, setCustomer] = useState<any[] | null>(null);
@@ -103,6 +113,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
   const [supabasePrices, setPrices] = useState<any[] | null>(null);
   const [stripeCustomer, setStripeCustomer] = useState<any | null>(null);
   const [stripeInvoices, setStripeInvoices] = useState<any | null>(null);
+  const [downloadCust, setDownloadCust] = useState<any | null>(null);
   const [value, setValue] = useState("");
   const [balance, setBalance] = useState(0);
   const [total, setTotal] = useState(0);
@@ -217,7 +228,56 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
             0
           );
           setBalance(totalAmountDue);
+
+          const notVoidInvoices = stripeCustomerInvoices.filter(
+            (invoice: Invoice) => invoice.status !== "Void"
+          );
+
+          const updatedInvoices = notVoidInvoices.map((invoice: any) => {
+            const updatedLines = invoice.lines.data.map((line: any) => {
+              const priceId = line.price.id;
+              const matchingPrice = prices?.find(
+                (price) => price.id === priceId
+              );
+
+              if (matchingPrice) {
+                const matchingProduct = products?.find(
+                  (product) => matchingPrice.product_id === product.id
+                );
+
+                if (matchingProduct) {
+                  return {
+                    ...existingStripeCustomer,
+                    price: matchingPrice.unit_amount,
+                    product: matchingProduct.name,
+                    quantity: line.quantity,
+                  };
+                } else {
+                  console.warn(`Product not found for price ID ${priceId}`);
+                  return null; // Return null for unmatched products
+                }
+              } else {
+                console.warn(`Price not found for ID ${priceId}`);
+                return null; // Return null for unmatched prices
+              }
+            });
+
+            return updatedLines.filter((line: any) => line !== null); // Filter out null values
+          });
+
+          // Filter out invoices with no valid lines
+          // Flatten the array of arrays
+          const flattenedInvoices = updatedInvoices.flat();
+
+          // Filter out invoices with no valid lines
+          const filteredInvoices = flattenedInvoices.filter(
+            (invoice: any) => invoice !== null
+          );
+
+          console.log("updatedInvoices", filteredInvoices);
+          setDownloadCust(filteredInvoices);
         }
+
         setStripeInvoices(stripeCustomerInvoices);
         console.log(stripeCustomerInvoices);
         setBilling(customer![0].billing_address);
@@ -366,7 +426,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                 <h2>No address found</h2>
               )}
             </div>
-            <div className="items-start justify-start py-4 text-sm">
+            <div className="items-start justify-start py-2 text-sm">
               {!!supabaseCustomer[0] && !!supabaseCustomer![0].id ? (
                 <Button
                   className="bg-background text-foreground hover:bg-slate-500"
@@ -381,7 +441,20 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                 <h2>No address found</h2>
               )}
             </div>
-            <div>
+            <div className="items-start justify-start py-2 text-sm">
+              {!!supabaseCustomer[0] && !!supabaseCustomer![0].id ? (
+                <Button
+                  className="bg-background text-foreground hover:bg-slate-500"
+                  variant="outline"
+                  onClick={() => downloadPdf(downloadCust)}
+                >
+                  Download customer info
+                </Button>
+              ) : (
+                <h2>No Customer found</h2>
+              )}
+            </div>
+            <div className="items-start justify-start py-2 text-sm">
               <Dialog>
                 <DialogTrigger asChild>
                   <Button

@@ -77,9 +77,6 @@ export default function Sidebar() {
               <Link href="/admin/dashboard/sales">Sales</Link>
             </li>
             <li>
-              <Link href="/admin/dashboard/orders">Orders</Link>
-            </li>
-            <li>
               <Link href="/admin/dashboard/jobs">Jobs</Link>
             </li>
             <li>

@@ -44,6 +44,7 @@ export type Product = {
 async function getData(): Promise<Product[]> {
   const supabase = createClient();
   const { data: products, error } = await supabase.from("products").select();
+  console.log("data", products);
 
   if (!products) {
     return []; // Return an empty array if products is null
