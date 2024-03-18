@@ -1,4 +1,3 @@
-"use client";
 import NavBar from "@/components/NavBar";
 import background from "../img/kitchen-hero2.jpg";
 import step1 from "../img/step1.jpg";
@@ -51,7 +50,7 @@ export default async function Index() {
                   Get started
                 </a>
                 <a
-                  href="/client/services"
+                  href="/client/faq"
                   className="rounded-md px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
                   Learn more <span aria-hidden="true">→</span>

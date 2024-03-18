@@ -1,5 +1,5 @@
+"use server";
 import Link from "next/link";
-import { headers } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -11,15 +11,18 @@ export default async function LoginPage({
 }: {
   searchParams: { message: string };
 }) {
-  const checkLoggedIn = async () => {
-    const supabase = createClient();
-    const user = await supabase.auth.getUser();
+  const supabase = createClient();
+  async function checkLoggedIn() {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    console.log(user);
 
     if (user) {
       // If user is already logged in, redirect to dashboard
-      return redirect("/admin/dashboard");
+      redirect("/admin/dashboard");
     }
-  };
+  }
 
   const signIn = async (formData: FormData) => {
     "use server";
@@ -34,10 +37,10 @@ export default async function LoginPage({
     });
 
     if (error) {
-      return redirect("/admin?message=Could not authenticate user");
+      redirect("/admin?message=Could not authenticate user");
     }
 
-    return redirect("/admin/dashboard");
+    redirect("/admin/dashboard");
   };
   await checkLoggedIn();
   return (
