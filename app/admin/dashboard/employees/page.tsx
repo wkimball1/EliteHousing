@@ -30,7 +30,7 @@ export default async function EmployeesPage() {
       <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:leading-[1.1]">
         Employees
       </h1>
-      <div className="container mx-auto py-10 bg-background">
+      <div className="container w-3/4 my-auto mx-auto py-10 bg-background">
         <EmployeeTable data={data} />
       </div>
     </div>
