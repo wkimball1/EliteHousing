@@ -13,10 +13,10 @@ export default function DashboardLayout({
   // Mobile sidebar visibility state
 
   return (
-    <div className="flex w-full max-w-full min-h-screen">
+    <div className="flex w-full max-w-full min-h-screen bg-background">
       <SidebarNav />
 
-      <div className="flex flex-col w-full max-w-full justify-start items-center py-16 md:py-4 px-2">
+      <div className="flex flex-col w-full max-w-full justify-start items-center py-16 md:py-4 px-2 bg-background">
         {children}
       </div>
     </div>

@@ -15,7 +15,10 @@ export default function Sidebar() {
   };
 
   return (
-    <div className={`w-fit drawer ${isSidebarOpen ? "lg:drawer-open" : ""}`}>
+    <div
+      className={`w-fit drawer z-50 ${isSidebarOpen ? "lg:drawer-open" : ""}`}
+      style={{ zIndex: 1000 }}
+    >
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
       <div className="flex flex-col items-start justify-start lg:hidden">
         <label
