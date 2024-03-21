@@ -94,14 +94,26 @@ const EmployeeTable = ({ data }: { data: Employees[] }) => {
         header: "Address",
         size: 120,
         Cell: ({ row }) => {
-          const { city, line1, line2, state, country, postal_code } =
-            row.original.address || {};
-          const addressString = `${line1}${line1 && line2 ? ", " : ""}${line2}${
-            line1 && city ? ", " : ""
-          }${city}${city && state ? ", " : ""}${state}${
-            (line1 || city || state) && postal_code ? " " : ""
-          }${postal_code}`;
-          return <div>{addressString}</div>;
+          if (
+            row.original.address &&
+            typeof row.original.address === "object"
+          ) {
+            const { city, line1, line2, state, postal_code } =
+              row.original.address;
+            // Further code handling the destructured properties
+            // For example, constructing the addressString as in your original code snippet
+            const addressString = `${line1}${
+              line1 && line2 ? ", " : ""
+            }${line2}${line1 && city ? ", " : ""}${city}${
+              city && state ? ", " : ""
+            }${state}${
+              (line1 || city || state) && postal_code ? " " : ""
+            }${postal_code}`;
+            return <div>{addressString}</div>;
+          } else {
+            // Handle the case when row.original.address is null, undefined, or not an object
+            return <div>No address available</div>; // Or any other appropriate message or action
+          }
         },
       },
     ],
