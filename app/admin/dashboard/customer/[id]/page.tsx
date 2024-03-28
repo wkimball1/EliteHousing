@@ -141,6 +141,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
       id: "",
       item: "New Item",
       description: "Description",
+      serial_number: "",
       price: 0,
       quantity: 1,
       open: false,
@@ -157,6 +158,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
         id: "",
         item: "New Item",
         description: "",
+        serial_number: "",
         price: 0,
         quantity: 1,
         open: false,
@@ -202,7 +204,10 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
           metadata: { employee: user!.id },
         });
 
-        const { data: products } = await supabase.from("products").select("*");
+        const { data: products } = await supabase
+          .from("products")
+          .select("*")
+          .order("brand", { ascending: true });
         setProducts(products);
         console.log(products);
 
@@ -294,6 +299,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
     newJob.products = tableData.map((data) => {
       const container = {
         id: data.id,
+        serial_number: data.serial_number,
         quantity: data.quantity,
         price_id: data.price_id,
       };
@@ -317,6 +323,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
         item: "New Item",
         description: "",
         price: 0,
+        serial_number: "",
         quantity: 1,
         open: false,
         price_id: "",
@@ -596,7 +603,8 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                       </Button>
                                     </PopoverTrigger>
-                                    <PopoverContent className="w-[300px] p-0 bg-background max-h-200px overflow-y-auto ">
+                                    <PopoverContent className="w-[500px] p-0 bg-background max-h-[200px] overflow-y-auto">
+                                      {/* Add max-h and overflow-y-auto styles directly to PopoverContent */}
                                       <Command>
                                         <CommandInput placeholder="Search products..." />
                                         <CommandEmpty>
@@ -617,6 +625,8 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                                                   currentValue;
                                                 newData[index].description =
                                                   product.description;
+                                                newData[index].serial_number =
+                                                  product.serial_number[0];
                                                 if (supabasePrices !== null) {
                                                   const prices =
                                                     supabasePrices!.find(
@@ -630,14 +640,16 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                                                     prices.id;
                                                 }
                                                 newData[index].open = false;
+                                                console.log(newData);
                                                 setTableData(newData);
                                               }}
                                             >
                                               {row.item === product.name && (
                                                 <Check className="mr-2 h-4 w-4 opacity-100" />
                                               )}
-
                                               {product.name}
+                                              {" - "}
+                                              {product.description}
                                             </CommandItem>
                                           ))}
                                         </CommandGroup>
@@ -645,6 +657,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                                     </PopoverContent>
                                   </Popover>
                                 </TableCell>
+
                                 <TableCell colSpan={3}>
                                   <Input
                                     type="currency"

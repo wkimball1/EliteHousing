@@ -37,7 +37,7 @@ export default function Sidebar() {
           <ul className="menu p-2 w-72 z-50 min-h-full bg-background text-base-content">
             <li className="user-select-none hover:bg-background focus:bg-background">
               <Link
-                href="/admin/dashboard"
+                href="/admin/dashboard/customers"
                 className="user-select-none hover:bg-background focus:bg-background"
               >
                 <img
@@ -58,7 +58,7 @@ export default function Sidebar() {
             </li>
 
             <li>
-              <Link href="/admin/dashboard">Home</Link>
+              <Link href="/admin/dashboard/customers">Home</Link>
             </li>
             <li>
               <Link href="/admin/dashboard/employees">Employees</Link>

@@ -68,6 +68,29 @@ const upsertJobRecord = async (job: InsertJob) => {
     .upsert(jobData);
   if (upsertError)
     throw new Error(`Job insert/update failed: ${upsertError.message}`);
+
+  for (const product of job.products!) {
+    const { data: existingProduct, error: selectError } = await supabaseAdmin
+      .from("products")
+      .select("id, quantity_available, serial_number, quantity_sold")
+      .eq("model_number", product.model_number as string);
+
+    const { data: updatedProduct, error: updateError } = await supabaseAdmin
+      .from("products")
+      .update({
+        quantity_available:
+          existingProduct![0].quantity_available! - product.quantity,
+        quantity_sold: existingProduct![0].quantity_sold + product.quantity,
+        serial_number: product.serial_number,
+      })
+      .eq("id", existingProduct![0].id);
+
+    if (updateError) {
+      throw new Error(`Error updating product: ${updateError.message}`);
+    }
+
+    console.log(`Product updated: ${updatedProduct![0]}`);
+  }
 };
 
 const createProduct = async (product: Product) => {
@@ -83,10 +106,15 @@ const createProduct = async (product: Product) => {
   if (existingProduct && existingProduct.length > 0) {
     // Product with the same model_number already exists
     const updatedQuantity = existingProduct[0].quantity_available! + 1;
-    const updatedSerialNumbers = [
-      ...existingProduct[0].serial_number!,
-      product.serial_number!,
-    ];
+    // Check if the serial number already exists in the serial_numbers array
+    const serialNumberExists = existingProduct[0].serial_number?.includes(
+      product.serial_number
+    );
+
+    let updatedSerialNumbers = [...existingProduct[0].serial_number!];
+    if (!serialNumberExists) {
+      updatedSerialNumbers.push(product.serial_number!);
+    }
 
     const { data: updatedProduct, error: updateError } = await supabaseAdmin
       .from("products")

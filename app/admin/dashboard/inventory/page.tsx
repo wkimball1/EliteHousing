@@ -21,7 +21,10 @@ import { PlusIcon } from "lucide-react";
 import { Button } from "@mantine/core";
 import { NumberInput } from "@mantine/core";
 import { createProduct } from "@/utils/supabase/admin";
-import { supabaseProductCreate } from "@/components/supabaseServer";
+import {
+  loadProductsToSupabase,
+  supabaseProductCreate,
+} from "@/components/supabaseServer";
 
 type Price = Tables<"prices">;
 
@@ -119,6 +122,12 @@ export default function InventoryPage() {
     window.location.reload();
   };
 
+  const loadProducts = async () => {
+    const products = await loadProductsToSupabase();
+    console.log(products);
+    window.location.reload();
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     const { name, value } = e.target;
@@ -135,7 +144,7 @@ export default function InventoryPage() {
         Inventory
       </h1>
       <div className="container mx-auto py-10">
-        <div className="pb-4">
+        <div className="pb-4 ">
           <Dialog>
             <DialogTrigger asChild>
               <Button color="grey" leftSection={<PlusIcon />}>
@@ -263,6 +272,10 @@ export default function InventoryPage() {
         </div>
         <ProductsTable data={data} />
       </div>
+      <span className="pt-4" />
+      <Button color="grey" onClick={loadProducts}>
+        Do Not Click
+      </Button>
     </div>
   );
 }

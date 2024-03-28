@@ -20,7 +20,7 @@ export default async function LoginPage({
 
     if (user) {
       // If user is already logged in, redirect to dashboard
-      redirect("/admin/dashboard");
+      redirect("/admin/dashboard/customers");
     }
   }
 
@@ -40,7 +40,7 @@ export default async function LoginPage({
       redirect("/admin?message=Could not authenticate user");
     }
 
-    redirect("/admin/dashboard");
+    redirect("/admin/dashboard/customers");
   };
   await checkLoggedIn();
   return (
