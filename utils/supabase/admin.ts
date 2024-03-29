@@ -93,6 +93,31 @@ const upsertJobRecord = async (job: InsertJob) => {
   }
 };
 
+const updateJobRecord = async (job: UpdateJob) => {
+  const jobData: UpdateJob = {
+    id: job.id,
+    invoice_id: job.invoice_id,
+    is_paid: job.is_paid,
+    is_work_done: job.is_work_done,
+    work_completed_date: job.work_completed_date,
+    products: job.products,
+    customer: job.customer,
+    employee: job.employee,
+    job_status: job.job_status,
+    invoice_status: job.invoice_status,
+    address: job.address,
+  };
+
+  const { data: jobs, error: updateError } = await supabaseAdmin
+    .from("jobs")
+    .update(jobData)
+    .eq("id", job.id!);
+  if (updateError)
+    throw new Error(`Job insert/update failed: ${updateError.message}`);
+
+  return jobs;
+};
+
 const createProduct = async (product: Product) => {
   const { data: existingProduct, error: selectError } = await supabaseAdmin
     .from("products")
@@ -530,6 +555,7 @@ export {
   manageSubscriptionStatusChange,
   upsertCustomer,
   upsertJobRecord,
+  updateJobRecord,
   upsertJobFromStripe,
   createProduct,
 };

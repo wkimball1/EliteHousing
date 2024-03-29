@@ -3,6 +3,7 @@ import {
   useMantineReactTable,
   type MRT_ColumnDef,
   type MRT_Row,
+  MRT_TableOptions,
 } from "mantine-react-table";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css"; //if using mantine date picker features
@@ -12,89 +13,177 @@ import { IconDownload } from "@tabler/icons-react";
 import { jsPDF } from "jspdf"; //or use your library of choice here
 import autoTable from "jspdf-autotable";
 import { Tables } from "@/types_db";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { DateInput, DatePicker } from "@mantine/dates";
+import { updateJob } from "@/components/supabaseServer";
 
 type Jobs = Tables<"jobs">;
 
-const columns: MRT_ColumnDef<Jobs>[] = [
-  { accessorKey: "id", header: "ID", size: 120 },
-  {
-    accessorKey: "created_at",
-    header: "Start Date",
-    size: 40,
-    Cell: ({ row }) => {
-      const currentDate = new Date(row.original.created_at);
+// Create ComboboxItem objects for boolean options
+const boolOptions = ["true", "false"];
+const jobOptions = ["pending", "complete", "error", "hold"];
 
-      // Create an Intl.DateTimeFormat object for Eastern Time
-      const easternTimeFormatter = new Intl.DateTimeFormat("en-US", {
-        timeZone: "America/New_York", // 'America/New_York' corresponds to Eastern Time
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      });
+function convertDateFormat(dateString: string) {
+  // Split the input date string into month, day, and year components
+  const [month, day, year] = dateString.split("/").map(Number);
 
-      // Format the date in Eastern Time
-      const formattedDate = easternTimeFormatter.format(currentDate);
+  // Create a new Date object using the extracted components
+  const date = new Date(year, month - 1, day);
 
-      return <div>{formattedDate}</div>;
-    },
-  },
-  { accessorKey: "invoice_id", header: "Invoice Id", size: 120 },
-  {
-    accessorKey: "is_paid",
-    header: "Paid",
-    size: 40,
-    Cell: ({ row }) => (
-      <div className="capitalize">{row.original.is_paid.toString()}</div>
-    ),
-  },
-  {
-    accessorKey: "is_work_done",
-    header: "Complete",
-    size: 40,
-    Cell: ({ row }) => (
-      <div className="capitalize">{row.original.is_work_done.toString()}</div>
-    ),
-  },
-  {
-    accessorKey: "work_completed_date",
-    header: "Job Completion Date",
-    size: 120,
-  },
-  {
-    accessorKey: "products",
-    header: "Products",
-    size: 120,
-    Cell: ({ row }) => {
-      const products = row.original.products || [];
-      const formattedProducts = products.map((product) => {
-        return `${product.id} (Quantity: ${product.quantity})`;
-      });
-      return <div>{formattedProducts.join(", ")}</div>;
-    },
-  },
-  { accessorKey: "customer", header: "Customer", size: 120 },
-  { accessorKey: "employee", header: "Employee", size: 120 },
-  { accessorKey: "job_status", header: "Job Status", size: 40 },
-  { accessorKey: "invoice_status", header: "Invoice Status", size: 40 },
-  {
-    accessorKey: "address",
-    header: "Shipping Address",
-    size: 120,
-    Cell: ({ row }) => {
-      const { city, line1, line2, state, country, postal_code } =
-        row.original.address || {};
-      const addressString = `${line1}${line1 && line2 ? ", " : ""}${line2}${
-        line1 && city ? ", " : ""
-      }${city}${city && state ? ", " : ""}${state}${
-        (line1 || city || state) && postal_code ? " " : ""
-      }${postal_code}`;
-      return <div>{addressString}</div>;
-    },
-  },
-];
+  // Extract date components
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based, so add 1 and pad with leading zero if needed
+  const dd = String(date.getDate()).padStart(2, "0");
+
+  // Construct the yyyy-mm-dd formatted date string
+  const formattedDateString = `${yyyy}-${mm}-${dd}`;
+
+  return formattedDateString;
+}
 
 const JobsTable = ({ data }: { data: Jobs[] }) => {
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string | undefined>
+  >({});
+
+  const columns = useMemo<MRT_ColumnDef<Jobs>[]>(
+    () => [
+      { accessorKey: "id", header: "ID", size: 120, enableEditing: false },
+      {
+        accessorKey: "created_at",
+        header: "Start Date",
+        size: 40,
+        Cell: ({ row }) => {
+          const currentDate = new Date(row.original.created_at);
+
+          // Create an Intl.DateTimeFormat object for Eastern Time
+          const easternTimeFormatter = new Intl.DateTimeFormat("en-US", {
+            timeZone: "America/New_York", // 'America/New_York' corresponds to Eastern Time
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          });
+
+          // Format the date in Eastern Time
+          const formattedDate = easternTimeFormatter.format(currentDate);
+
+          return <div>{formattedDate}</div>;
+        },
+        enableEditing: false,
+      },
+      {
+        accessorKey: "invoice_id",
+        header: "Invoice Id",
+        size: 120,
+        enableEditing: false,
+      },
+      {
+        accessorKey: "is_paid",
+        header: "Paid",
+        size: 40,
+        Cell: ({ row }) => (
+          <div className="capitalize">{row.original.is_paid.toString()}</div>
+        ),
+        enableEditing: false,
+      },
+      {
+        accessorKey: "is_work_done",
+        header: "Complete",
+        size: 40,
+        Cell: ({ row }) => (
+          <div className="capitalize">
+            {row.original.is_work_done.toString()}
+          </div>
+        ),
+        editVariant: "select",
+        mantineEditSelectProps: {
+          data: boolOptions,
+          error: validationErrors?.boolOptions,
+        },
+      },
+      {
+        accessorKey: "work_completed_date",
+        header: "Job Completion",
+        size: 120,
+        mantineEditTextInputProps: {
+          error: validationErrors?.work_completed_date,
+          placeholder: "mm/dd/yyyy",
+        },
+      },
+      {
+        accessorKey: "products",
+        header: "Products",
+        size: 120,
+        Cell: ({ row }) => {
+          const products = row.original.products || [];
+          const formattedProducts = products.map((product) => {
+            return `${product.id} (Quantity: ${product.quantity})`;
+          });
+          return <div>{formattedProducts.join(", ")}</div>;
+        },
+        enableEditing: false,
+      },
+      {
+        accessorKey: "customer",
+        header: "Customer",
+        size: 120,
+        enableEditing: false,
+      },
+      {
+        accessorKey: "employee",
+        header: "Employee",
+        size: 120,
+        enableEditing: false,
+      },
+      {
+        accessorKey: "job_status",
+        header: "Job Status",
+        size: 40,
+        editVariant: "select",
+        mantineEditSelectProps: {
+          data: jobOptions,
+          error: validationErrors?.jobOptions,
+        },
+      },
+      {
+        accessorKey: "invoice_status",
+        header: "Invoice Status",
+        size: 40,
+        enableEditing: false,
+      },
+
+      {
+        accessorKey: "address",
+        header: "Shipping Address",
+        size: 120,
+        Cell: ({ row }) => {
+          const { city, line1, line2, state, country, postal_code } =
+            row.original.address || {};
+          const addressString = `${line1}${line1 && line2 ? ", " : ""}${line2}${
+            line1 && city ? ", " : ""
+          }${city}${city && state ? ", " : ""}${state}${
+            (line1 || city || state) && postal_code ? " " : ""
+          }${postal_code}`;
+          return <div>{addressString}</div>;
+        },
+        enableEditing: false,
+      },
+    ],
+    [validationErrors]
+  );
+
+  const handleSaveJob: MRT_TableOptions<Jobs>["onEditingRowSave"] = async ({
+    values,
+    table,
+  }) => {
+    const formattedDate = convertDateFormat(values.work_completed_date);
+
+    // Update the values object with the formatted date
+    const updatedValues = { ...values, work_completed_date: formattedDate };
+    await updateJob(updatedValues);
+    table.setEditingRow(null); //exit editing mode
+  };
+
   const handleExportRows = (rows: MRT_Row<Jobs>[]) => {
     const doc = new jsPDF({ orientation: "landscape" });
     const tableData: string[][] = rows.map((row) => {
@@ -175,10 +264,14 @@ const JobsTable = ({ data }: { data: Jobs[] }) => {
     columns,
     data,
     enableRowSelection: true,
+    onEditingRowCancel: () => setValidationErrors({}),
+    onEditingRowSave: handleSaveJob,
     initialState: { density: "xs", showColumnFilters: true },
     columnFilterDisplayMode: "subheader",
     paginationDisplayMode: "pages",
     enableGlobalFilter: false,
+    editDisplayMode: "row",
+    enableEditing: true,
     positionToolbarAlertBanner: "bottom",
     renderTopToolbarCustomActions: ({ table }) => (
       <Box

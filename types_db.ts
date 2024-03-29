@@ -79,6 +79,7 @@ export interface Database {
           job_status: Database["public"]["Enums"]["job_status"] | null;
           invoice_status: Database["public"]["Enums"]["invoice_status"] | null;
           address?: any | null;
+          is_deleted: boolean;
         };
         Insert: {
           invoice_id?: string | null;
@@ -91,6 +92,7 @@ export interface Database {
           job_status?: Database["public"]["Enums"]["job_status"] | null;
           invoice_status?: Database["public"]["Enums"]["invoice_status"] | null;
           address?: any | null;
+          is_deleted?: boolean;
         };
         Update: {
           id?: string | null;
@@ -105,6 +107,7 @@ export interface Database {
           job_status?: Database["public"]["Enums"]["job_status"] | null;
           invoice_status?: Database["public"]["Enums"]["invoice_status"] | null;
           address?: any | null;
+          is_deleted?: boolean;
         };
         Relationships: [
           {

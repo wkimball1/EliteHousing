@@ -1,7 +1,11 @@
 "use server";
 import { Product } from "@/app/admin/dashboard/inventory/page";
 import { Tables, TablesInsert } from "@/types_db";
-import { createProduct, upsertJobRecord } from "@/utils/supabase/admin";
+import {
+  createProduct,
+  updateJobRecord,
+  upsertJobRecord,
+} from "@/utils/supabase/admin";
 import React from "react";
 
 type Job = TablesInsert<"jobs">;
@@ -977,6 +981,10 @@ const testProducts: any[] = [
 
 export const supabaseServer = (job: Job) => {
   return upsertJobRecord(job);
+};
+
+export const updateJob = (job: Job) => {
+  return updateJobRecord(job);
 };
 
 export const supabaseProductCreate = (product: Product) => {
