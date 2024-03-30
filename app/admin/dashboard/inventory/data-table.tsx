@@ -116,6 +116,7 @@ const ProductsTable = ({ data }: { data: any }) => {
     enableRowSelection: true,
     initialState: { density: "xs" },
     columnFilterDisplayMode: "popover",
+    enableEditing: true,
     paginationDisplayMode: "pages",
     positionToolbarAlertBanner: "bottom",
     renderTopToolbarCustomActions: ({ table }) => (

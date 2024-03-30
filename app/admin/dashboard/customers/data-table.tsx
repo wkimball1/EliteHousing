@@ -161,6 +161,7 @@ const CustomerTable = ({ data }: { data: Customers[] }) => {
     columnFilterDisplayMode: "subheader",
     paginationDisplayMode: "pages",
     enableGlobalFilter: false,
+    enableEditing: true,
     positionToolbarAlertBanner: "bottom",
     renderTopToolbarCustomActions: ({ table }) => (
       <Box
