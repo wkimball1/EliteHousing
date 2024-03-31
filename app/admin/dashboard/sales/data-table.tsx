@@ -25,7 +25,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Dialog } from "@/components/ui/dialog";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
-import InvoiceDialog from "../customer/[id]/InvoiceDialog";
 import Link from "next/link";
 
 type Sales = Tables<"sales">;
