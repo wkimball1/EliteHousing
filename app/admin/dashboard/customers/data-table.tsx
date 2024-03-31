@@ -43,85 +43,100 @@ type Customers = Tables<"customers">;
 //   // Add other properties as needed
 // };
 
-const columns: MRT_ColumnDef<Customers>[] = [
-  { accessorKey: "id", header: "Id", size: 80 },
-  { accessorKey: "full_name", header: "Name", size: 80 },
-  {
-    accessorKey: "email",
-    header: "Email",
-    size: 80,
-    Cell: ({ renderedCellValue }) => (
-      <div className="lowercase">{renderedCellValue}</div>
-    ),
-  },
-  {
-    accessorKey: "billing_address",
-    header: "Address",
-    size: 120,
-    Cell: ({ row }) => {
-      const { city, line1, line2, state, country, postal_code } =
-        row.original.billing_address || {};
-      const addressString = `${line1}${line1 && line2 ? ", " : ""}${line2}${
-        line1 && city ? ", " : ""
-      }${city}${city && state ? ", " : ""}${state}${
-        (line1 || city || state) && postal_code ? " " : ""
-      }${postal_code}`;
-      return <div>{addressString}</div>;
-    },
-  },
-  { accessorKey: "phone", header: "Phone #", size: 60 },
-  {
-    accessorKey: "actions",
-    header: "Actions",
-    size: 40,
-    enableColumnActions: false,
-    enableColumnFilter: false,
-    enableSorting: false,
-    Cell: ({ row }) => {
-      const customer = row.original;
-      const router = useRouter();
-      const searchParams = useSearchParams();
-
-      const createQueryString = useCallback(
-        (name: string, value: string) => {
-          const params = new URLSearchParams(searchParams.toString());
-          params.set(name, value);
-
-          return params.toString();
-        },
-        [searchParams]
-      );
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="subtle" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <DotsHorizontalIcon className="h-5 w-5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-background">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(customer.id)}
-            >
-              Copy customer ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() =>
-                router.push("/admin/dashboard/customer/" + customer.id)
-              }
-            >
-              View customer details
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
-  },
-];
-
 const CustomerTable = ({ data }: { data: Customers[] }) => {
+  const columns: MRT_ColumnDef<Customers>[] = [
+    { accessorKey: "id", header: "Id", size: 80 },
+    { accessorKey: "full_name", header: "Name", size: 80 },
+    {
+      accessorKey: "email",
+      header: "Email",
+      size: 80,
+      Cell: ({ renderedCellValue }) => (
+        <div className="lowercase">{renderedCellValue}</div>
+      ),
+    },
+    {
+      accessorKey: "billing_address",
+      header: "Address",
+      size: 120,
+      enableEditing: false,
+      Cell: ({ row, table }) => {
+        // Get the billing_address object from the row
+        const addressObj = row.original.billing_address;
+
+        // Check if addressObj is an object and not null
+        if (typeof addressObj === "object" && addressObj !== null) {
+          const { city, line1, line2, state, country, postal_code } =
+            addressObj;
+
+          // Construct the formatted address string
+          const addressString = `${line1}${line1 && line2 ? ", " : ""}${line2}${
+            line1 && city ? ", " : ""
+          }${city}${city && state ? ", " : ""}${state}${
+            (line1 || city || state) && postal_code ? " " : ""
+          }${postal_code}`;
+
+          // Return the formatted address string
+          return <div>{addressString}</div>;
+        }
+
+        // If addressObj is not an object or is null, return empty string
+        return <div></div>;
+      },
+    },
+
+    { accessorKey: "phone", header: "Phone #", size: 60 },
+    {
+      accessorKey: "actions",
+      header: "Actions",
+      size: 40,
+      enableColumnActions: false,
+      enableColumnFilter: false,
+      enableSorting: false,
+      Cell: ({ row }) => {
+        const customer = row.original;
+        const router = useRouter();
+        const searchParams = useSearchParams();
+
+        const createQueryString = useCallback(
+          (name: string, value: string) => {
+            const params = new URLSearchParams(searchParams.toString());
+            params.set(name, value);
+
+            return params.toString();
+          },
+          [searchParams]
+        );
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="subtle" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <DotsHorizontalIcon className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-background">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() => navigator.clipboard.writeText(customer.id)}
+              >
+                Copy customer ID
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() =>
+                  router.push("/admin/dashboard/customer/" + customer.id)
+                }
+              >
+                View customer details
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
+  ];
+
   const handleExportRows = (rows: MRT_Row<Customers>[]) => {
     const doc = new jsPDF();
     const tableData = rows.map((row) =>
@@ -161,7 +176,6 @@ const CustomerTable = ({ data }: { data: Customers[] }) => {
     columnFilterDisplayMode: "subheader",
     paginationDisplayMode: "pages",
     enableGlobalFilter: false,
-    enableEditing: true,
     positionToolbarAlertBanner: "bottom",
     renderTopToolbarCustomActions: ({ table }) => (
       <Box

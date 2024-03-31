@@ -164,7 +164,6 @@ const EmployeeTable = ({ data }: { data: Employees[] }) => {
     initialState: { density: "xs", showColumnFilters: true },
     columnFilterDisplayMode: "subheader",
     enableGlobalFilter: false,
-    enableEditing: true,
     paginationDisplayMode: "pages",
     positionToolbarAlertBanner: "bottom",
     renderTopToolbarCustomActions: ({ table }) => (

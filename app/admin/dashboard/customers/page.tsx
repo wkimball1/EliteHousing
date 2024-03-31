@@ -16,7 +16,10 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
 import { useEffect, useState } from "react";
-import { createCustomerInStripe } from "@/utils/stripe/server";
+import {
+  createAllCustomersInStripe,
+  createCustomerInStripe,
+} from "@/utils/stripe/server";
 import { useRouter } from "next/navigation";
 import { PlusIcon } from "lucide-react";
 import { Button } from "@mantine/core";
@@ -26,6 +29,7 @@ type Customer = Tables<"customers">;
 async function getData(): Promise<Customer[]> {
   const supabase = createClient();
   const { data: customer } = await supabase.from("customers").select("*");
+  console.log(customer);
   // Fetch data from your API here.
   return customer || [];
 }
@@ -62,6 +66,11 @@ export default function CustomersPage() {
     const newCustomer = stripeCustomer;
 
     const customer = await createCustomerInStripe(newCustomer);
+    console.log(customer);
+    window.location.reload();
+  };
+  const addCustomers = async () => {
+    const customer = await createAllCustomersInStripe();
     console.log(customer);
     window.location.reload();
   };
@@ -233,6 +242,9 @@ export default function CustomersPage() {
         </div>
         <CustomerTable data={data} />
       </div>
+      <Button color="grey" onClick={() => addCustomers()}>
+        Do not click
+      </Button>
     </div>
   );
 }

@@ -94,17 +94,25 @@ interface TableRow {
   id: string;
   item: string;
   description: string;
+  serial_number: string[];
   price: number;
   quantity: number;
   open: boolean;
   price_id: string;
 }
 
-const downloadPdf = async (customer: any[]) => {
-  const fileName = "customer-statement.pdf";
-  const blob = await pdf(<MyDocument customer={customer} />).toBlob();
-  saveAs(blob, fileName);
-};
+const initialTableData: TableRow[] = [
+  {
+    id: "",
+    item: "New Item",
+    description: "Description",
+    serial_number: [],
+    price: 0,
+    quantity: 1,
+    open: false,
+    price_id: "",
+  },
+];
 
 export default function CustomerPage({ params }: { params: { id: string } }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -113,7 +121,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
   const [supabasePrices, setPrices] = useState<any[] | null>(null);
   const [stripeCustomer, setStripeCustomer] = useState<any | null>(null);
   const [stripeInvoices, setStripeInvoices] = useState<any | null>(null);
-  const [downloadCust, setDownloadCust] = useState<any | null>(null);
+  const [downloadCust, setDownloadCust] = useState<any[] | null>([]);
   const [value, setValue] = useState("");
   const [balance, setBalance] = useState(0);
   const [total, setTotal] = useState(0);
@@ -136,35 +144,18 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
     invoice_status: "draft",
     address: "",
   });
-  const [tableData, setTableData] = useState([
-    {
-      id: "",
-      item: "New Item",
-      description: "Description",
-      serial_number: "",
-      price: 0,
-      quantity: 1,
-      open: false,
-      price_id: "",
-    },
-  ]);
+  const [tableData, setTableData] = useState(initialTableData);
 
   const router = useRouter();
 
   const addRow = () => {
-    setTableData((prevData) => [
-      ...prevData,
-      {
-        id: "",
-        item: "New Item",
-        description: "",
-        serial_number: "",
-        price: 0,
-        quantity: 1,
-        open: false,
-        price_id: "",
-      },
-    ]);
+    setTableData((prevData) => [...prevData, ...initialTableData]);
+  };
+
+  const downloadPdf = async (customer: any[]) => {
+    const fileName = "customer-statement.pdf";
+    const blob = await pdf(<MyDocument customer={customer} />).toBlob();
+    saveAs(blob, fileName);
   };
 
   const deleteRow = (index: number) => {
@@ -222,20 +213,20 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
         });
         if (stripeCustomerInvoices) {
           const validInvoices = stripeCustomerInvoices.filter(
-            (invoice: Invoice) =>
+            (invoice: any) =>
               invoice.status !== "Void" && invoice.status !== "Uncollectable"
           );
 
           // Extract amounts due from each valid invoice and sum them up
           const totalAmountDue = validInvoices.reduce(
-            (total: number, invoice: Invoice) =>
+            (total: any, invoice: { amount_remaining: any }) =>
               total + invoice.amount_remaining,
             0
           );
           setBalance(totalAmountDue);
 
           const notVoidInvoices = stripeCustomerInvoices.filter(
-            (invoice: Invoice) => invoice.status !== "Void"
+            (invoice: any) => invoice.status !== "Void"
           );
 
           const updatedInvoices = notVoidInvoices.map((invoice: any) => {
@@ -280,7 +271,24 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
           );
 
           console.log("updatedInvoices", filteredInvoices);
-          setDownloadCust(filteredInvoices);
+
+          if (filteredInvoices.length > 0) {
+            setDownloadCust(filteredInvoices);
+          } else {
+            // If filteredInvoices is empty, set a default value or handle it as needed
+            setDownloadCust([
+              {
+                ...existingStripeCustomer,
+              },
+            ]);
+          }
+        } else {
+          console.log("in else");
+          setDownloadCust([
+            {
+              ...existingStripeCustomer,
+            },
+          ]);
         }
 
         setStripeInvoices(stripeCustomerInvoices);
@@ -323,7 +331,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
         item: "New Item",
         description: "",
         price: 0,
-        serial_number: "",
+        serial_number: [],
         quantity: 1,
         open: false,
         price_id: "",
@@ -453,7 +461,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                 <Button
                   className="bg-background text-foreground hover:bg-slate-500"
                   variant="outline"
-                  onClick={() => downloadPdf(downloadCust)}
+                  onClick={() => downloadPdf(downloadCust || [])}
                 >
                   Download customer info
                 </Button>
@@ -625,8 +633,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                                                   currentValue;
                                                 newData[index].description =
                                                   product.description;
-                                                newData[index].serial_number =
-                                                  product.serial_number[0];
+
                                                 if (supabasePrices !== null) {
                                                   const prices =
                                                     supabasePrices!.find(
@@ -671,28 +678,47 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                                     value={row.quantity}
                                     onChange={(e) => {
                                       const newData = [...tableData];
+                                      const parsedValue = parseInt(
+                                        e.target.value,
+                                        10
+                                      );
 
-                                      // Check if the input is not empty
-                                      if (e.target.value !== "") {
-                                        const parsedValue = parseInt(
-                                          e.target.value,
-                                          10
-                                        );
+                                      // Check if parsedValue is a valid number and greater than or equal to 0
+                                      if (
+                                        !isNaN(parsedValue) &&
+                                        parsedValue >= 0
+                                      ) {
+                                        // Find the supabaseProduct with matching ID
+                                        const supabaseProduct =
+                                          supabaseProducts?.find(
+                                            (product) => product.id === row.id
+                                          );
 
-                                        // Check if parsedValue is a valid number
-                                        if (!isNaN(parsedValue)) {
+                                        // Check if supabaseProduct exists and if the selected quantity is less than or equal to available inventory (number of serial numbers)
+                                        if (
+                                          supabaseProduct &&
+                                          parsedValue <=
+                                            supabaseProduct.serial_number.length
+                                        ) {
                                           newData[index].quantity = parsedValue;
+
+                                          // Set serial_number to a slice of supabaseProduct.serial_number based on selected quantity
+                                          newData[index].serial_number =
+                                            supabaseProduct.serial_number.slice(
+                                              0,
+                                              parsedValue
+                                            );
+
                                           setTableData(newData);
                                         } else {
-                                          // Handle the case where the input is not a valid number, e.g., display an error message
+                                          // Display an error message or handle the case where selected quantity exceeds available inventory
                                           console.error(
-                                            "Invalid quantity input"
+                                            "Selected quantity exceeds available inventory"
                                           );
                                         }
                                       } else {
-                                        // Handle the case where the input is empty (optional: set quantity to 0)
-                                        newData[index].quantity = 0; // optional: set quantity to 0
-                                        // setTableData(newData); // optional: update the state even for empty input
+                                        // Handle the case where the input is not a valid positive number, e.g., display an error message
+                                        console.error("Invalid quantity input");
                                       }
                                     }}
                                   />

@@ -106,21 +106,29 @@ const MyDocument = ({ customer }: { customer: any[] }) => {
                 <Text style={styles.content}>Quantity</Text>
               </View>
             </View>
-            {pageData.map((product: any, idx: number) => (
-              <View key={idx} style={styles.tableRow}>
-                <View style={styles.tableCell}>
-                  <Text style={styles.content}>{product.product}</Text>
+            {pageData[0].product ? (
+              pageData.map((product: any, idx: number) => (
+                <View key={idx} style={styles.tableRow}>
+                  <View style={styles.tableCell}>
+                    <Text style={styles.content}>{product.product}</Text>
+                  </View>
+                  <View style={styles.tableCell}>
+                    <Text style={styles.content}>
+                      {balanceFormat((product.price / 100).toString())}
+                    </Text>
+                  </View>
+                  <View style={styles.tableCell}>
+                    <Text style={styles.content}>{product.quantity}</Text>
+                  </View>
                 </View>
+              ))
+            ) : (
+              <View style={styles.tableRow}>
                 <View style={styles.tableCell}>
-                  <Text style={styles.content}>
-                    {balanceFormat((product.price / 100).toString())}
-                  </Text>
-                </View>
-                <View style={styles.tableCell}>
-                  <Text style={styles.content}>{product.quantity}</Text>
+                  <Text style={styles.content}>No products purchased.</Text>
                 </View>
               </View>
-            ))}
+            )}
           </View>
         </View>
         <Text

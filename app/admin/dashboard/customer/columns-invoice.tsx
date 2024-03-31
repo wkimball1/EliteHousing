@@ -31,7 +31,6 @@ import {
 import Stripe from "stripe";
 import balanceFormat from "@/components/balanceFormat";
 import Link from "next/link";
-import InvoiceDialog from "./[id]/InvoiceDialog";
 import { Dialog } from "@/components/ui/dialog";
 
 import { useRouter } from "next/navigation";
@@ -145,7 +144,6 @@ const columns: MRT_ColumnDef<Invoice>[] = [
               className="bg-background flex flex-col items-center text-sm"
               onClick={(e) => e.stopPropagation()}
             >
-              <InvoiceDialog invoice={invoice} />
               {invoice.status === "draft" && (
                 <ShadButton
                   variant="ghost"

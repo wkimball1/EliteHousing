@@ -8,14 +8,23 @@ import {
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css"; //if using mantine date picker features
 import "mantine-react-table/styles.css";
-import { Box, Button, MantineProvider, useMantineTheme } from "@mantine/core";
-import { IconDownload } from "@tabler/icons-react";
+import {
+  ActionIcon,
+  Box,
+  Button,
+  Flex,
+  MantineProvider,
+  Text,
+  Tooltip,
+  useMantineTheme,
+} from "@mantine/core";
+import { IconDownload, IconEdit, IconTrash } from "@tabler/icons-react";
 import { jsPDF } from "jspdf"; //or use your library of choice here
 import autoTable from "jspdf-autotable";
 import { Tables } from "@/types_db";
 import { useMemo, useState } from "react";
-import { DateInput, DatePicker } from "@mantine/dates";
-import { updateJob } from "@/components/supabaseServer";
+import { ModalsProvider, modals } from "@mantine/modals";
+import { deleteJob, updateJob } from "@/components/supabaseServer";
 
 type Jobs = Tables<"jobs">;
 
@@ -172,18 +181,6 @@ const JobsTable = ({ data }: { data: Jobs[] }) => {
     [validationErrors]
   );
 
-  const handleSaveJob: MRT_TableOptions<Jobs>["onEditingRowSave"] = async ({
-    values,
-    table,
-  }) => {
-    const formattedDate = convertDateFormat(values.work_completed_date);
-
-    // Update the values object with the formatted date
-    const updatedValues = { ...values, work_completed_date: formattedDate };
-    await updateJob(updatedValues);
-    table.setEditingRow(null); //exit editing mode
-  };
-
   const handleExportRows = (rows: MRT_Row<Jobs>[]) => {
     const doc = new jsPDF({ orientation: "landscape" });
     const tableData: string[][] = rows.map((row) => {
@@ -259,6 +256,28 @@ const JobsTable = ({ data }: { data: Jobs[] }) => {
 
     doc.save("HRS-Jobs.pdf");
   };
+  const handleSaveJob: MRT_TableOptions<Jobs>["onEditingRowSave"] = async ({
+    values,
+    table,
+  }) => {
+    const formattedDate = convertDateFormat(values.work_completed_date);
+
+    // Update the values object with the formatted date
+    const updatedValues = { ...values, work_completed_date: formattedDate };
+    await updateJob(updatedValues);
+    table.setEditingRow(null); //exit editing mode
+  };
+  //DELETE action
+  const openDeleteConfirmModal = (row: MRT_Row<Jobs>) => {
+    console.log("Opening delete confirmation modal for row:", row);
+    modals.openConfirmModal({
+      title: "Are you sure you want to delete this job?",
+
+      labels: { confirm: "Delete", cancel: "Cancel" },
+      confirmProps: { color: "red" },
+      onConfirm: () => deleteJob(row.original),
+    });
+  };
 
   const table = useMantineReactTable({
     columns,
@@ -272,6 +291,7 @@ const JobsTable = ({ data }: { data: Jobs[] }) => {
     enableGlobalFilter: false,
     editDisplayMode: "row",
     enableEditing: true,
+    getRowId: (row) => row.id,
     positionToolbarAlertBanner: "bottom",
     renderTopToolbarCustomActions: ({ table }) => (
       <Box
@@ -317,6 +337,20 @@ const JobsTable = ({ data }: { data: Jobs[] }) => {
           Export Selected Rows
         </Button>
       </Box>
+    ),
+    renderRowActions: ({ row, table }) => (
+      <Flex gap="md">
+        <Tooltip label="Edit">
+          <ActionIcon onClick={() => table.setEditingRow(row)}>
+            <IconEdit />
+          </ActionIcon>
+        </Tooltip>
+        <Tooltip label="Delete">
+          <ActionIcon color="red" onClick={() => openDeleteConfirmModal(row)}>
+            <IconTrash />
+          </ActionIcon>
+        </Tooltip>
+      </Flex>
     ),
   });
 

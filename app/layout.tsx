@@ -13,6 +13,7 @@ import { Suspense } from "react";
 import "@mantine/core/styles.css";
 
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
+import { ModalsProvider } from "@mantine/modals";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -54,7 +55,7 @@ export default function RootLayout({
           <Suspense fallback={<Loading />}>
             <main className="min-h-screen w-full max-w-full flex flex-col">
               <MantineProvider defaultColorScheme="auto">
-                {children}
+                <ModalsProvider>{children}</ModalsProvider>
               </MantineProvider>
             </main>
           </Suspense>

@@ -3,6 +3,7 @@ import { Product } from "@/app/admin/dashboard/inventory/page";
 import { Tables, TablesInsert } from "@/types_db";
 import {
   createProduct,
+  deleteJobRecord,
   updateJobRecord,
   upsertJobRecord,
 } from "@/utils/supabase/admin";
@@ -985,6 +986,10 @@ export const supabaseServer = (job: Job) => {
 
 export const updateJob = (job: Job) => {
   return updateJobRecord(job);
+};
+
+export const deleteJob = (job: Job) => {
+  return deleteJobRecord(job);
 };
 
 export const supabaseProductCreate = (product: Product) => {

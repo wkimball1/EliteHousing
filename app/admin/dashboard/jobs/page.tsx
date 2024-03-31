@@ -18,7 +18,10 @@ function JobsPage() {
     (async () => {
       setIsLoading(true);
       try {
-        let { data, error } = await supabase.from("jobs").select("*");
+        let { data, error } = await supabase
+          .from("jobs")
+          .select("*")
+          .neq("is_deleted", true);
         setJobs(data);
         console.log(data);
       } catch (err) {
@@ -42,6 +45,7 @@ function JobsPage() {
           <TabsContent value="all-jobs">
             <JobsTable data={supabaseJobs || []} />
           </TabsContent>
+
           <TabsContent value="current-jobs"></TabsContent>
           <TabsContent value="past-jobs"></TabsContent>
         </Tabs>

@@ -107,6 +107,23 @@ const updateJobRecord = async (job: UpdateJob) => {
     invoice_status: job.invoice_status,
     address: job.address,
   };
+};
+
+const deleteJobRecord = async (job: UpdateJob) => {
+  const jobData: UpdateJob = {
+    id: job.id,
+    invoice_id: job.invoice_id,
+    is_paid: job.is_paid,
+    is_work_done: job.is_work_done,
+    work_completed_date: job.work_completed_date,
+    products: job.products,
+    customer: job.customer,
+    employee: job.employee,
+    job_status: job.job_status,
+    invoice_status: job.invoice_status,
+    address: job.address,
+    is_deleted: true,
+  };
 
   const { data: jobs, error: updateError } = await supabaseAdmin
     .from("jobs")
@@ -556,6 +573,7 @@ export {
   upsertCustomer,
   upsertJobRecord,
   updateJobRecord,
+  deleteJobRecord,
   upsertJobFromStripe,
   createProduct,
 };
