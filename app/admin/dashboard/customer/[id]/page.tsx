@@ -657,6 +657,9 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                                               {product.name}
                                               {" - "}
                                               {product.description}
+                                              {" - "}
+                                              {" quantity: "}
+                                              {product.quantity_available}
                                             </CommandItem>
                                           ))}
                                         </CommandGroup>
