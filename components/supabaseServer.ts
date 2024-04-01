@@ -1,15 +1,33 @@
 "use server";
 import { Product } from "@/app/admin/dashboard/inventory/page";
-import { Tables, TablesInsert } from "@/types_db";
+import { Tables, TablesInsert, TablesUpdate } from "@/types_db";
 import {
   createProduct,
   deleteJobRecord,
+  deletedProductRecord,
   updateJobRecord,
+  updateProductRecord,
   upsertJobRecord,
 } from "@/utils/supabase/admin";
 import React from "react";
 
 type Job = TablesInsert<"jobs">;
+
+export type ProductDelete = {
+  active?: boolean | null;
+  description?: string | null;
+  id: string;
+  image?: string | null;
+  name?: string | null;
+  price?: number | null;
+  quantity_available?: number | null;
+  quantity_sold?: number | null;
+  cost?: number | null;
+  model_number?: string | null;
+  serial_number?: any[] | null;
+  brand?: string | null;
+  metadata?: any | null;
+};
 
 const testProducts: any[] = [
   {
@@ -990,6 +1008,13 @@ export const updateJob = (job: Job) => {
 
 export const deleteJob = (job: Job) => {
   return deleteJobRecord(job);
+};
+export const deleteProduct = (product: ProductDelete) => {
+  return deletedProductRecord(product);
+};
+
+export const updateProduct = (product: ProductDelete) => {
+  return updateProductRecord(product);
 };
 
 export const supabaseProductCreate = (product: Product) => {

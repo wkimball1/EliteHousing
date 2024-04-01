@@ -169,20 +169,38 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
     const blob = await pdf(<MyDocument customer={customer} />).toBlob();
     saveAs(blob, fileName);
   };
-
   const deleteRow = (index: number) => {
     const newData = [...tableData];
-    const myData = newData.splice(index, 1);
+    const [deletedRow] = newData.splice(index, 1);
     const supabaseProduct = supabaseProducts?.find(
-      (product) => product.id === myData[0].id
+      (product) => product.id === deletedRow.id
     );
-    setProducts({
-      ...supabaseProduct,
-      serial_number: supabaseProduct.serial_number.unshift(
-        myData[0].serial_number
-      ),
-    });
 
+    if (supabaseProduct) {
+      // Add the serial_numbers from deletedRow to supabaseProduct.serial_number
+      const updatedSerialNumbers = [
+        ...supabaseProduct.serial_number,
+        ...deletedRow.serial_number,
+      ];
+
+      // Update supabaseProduct with the modified serial_numbers
+      const updatedSupabaseProduct = {
+        ...supabaseProduct,
+        serial_number: updatedSerialNumbers,
+      };
+
+      // Update supabaseProducts array with the modified supabaseProduct
+      const updatedSupabaseProducts = supabaseProducts!.map((product) =>
+        product.id === updatedSupabaseProduct.id
+          ? updatedSupabaseProduct
+          : product
+      );
+
+      // Set the updated supabaseProducts array
+      setProducts(updatedSupabaseProducts);
+    }
+
+    // Update the state with the modified data for newData
     setTableData(newData);
   };
 
@@ -220,6 +238,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
         const { data: products } = await supabase
           .from("products")
           .select("*")
+          .eq("active", true) // Fetch products where is_deleted is not true
           .order("brand", { ascending: true });
         setProducts(products);
         console.log("supabaseProducts", products);
@@ -346,7 +365,8 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
       supabaseCustomer![0]
     );
     newJob.invoice_id = invoiceId;
-    const jobs = await supabaseServer(newJob);
+    await supabaseServer(newJob);
+
     setTableData([
       {
         id: "",
@@ -633,7 +653,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                       </Button>
                                     </PopoverTrigger>
-                                    <PopoverContent className="w-[500px] p-0 bg-background max-h-[200px] overflow-y-auto">
+                                    <PopoverContent className="w-[400px] p-0 bg-background max-h-[200px] overflow-y-auto">
                                       {/* Add max-h and overflow-y-auto styles directly to PopoverContent */}
                                       <Command>
                                         <CommandInput placeholder="Search products..." />
@@ -725,30 +745,65 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                                           // Check if supabaseProduct exists and if the selected quantity is less than or equal to available inventory (number of serial numbers)
                                           if (
                                             supabaseProduct &&
-                                            parsedValue <=
+                                            parsedValue -
+                                              newData[index].quantity <=
                                               supabaseProduct.serial_number
                                                 .length
                                           ) {
                                             if (
-                                              parsedValue >
+                                              parsedValue >=
                                               newData[index].quantity
                                             ) {
+                                              console.log(
+                                                "quantity",
+                                                newData[index].quantity
+                                              );
+                                              console.log(
+                                                "parsedValue",
+                                                parsedValue
+                                              );
                                               // Increase in quantity, take serial numbers from supabaseProduct and add to newData
                                               const addedSerialNumbers =
                                                 supabaseProduct.serial_number.slice(
-                                                  newData[index].quantity,
-                                                  parsedValue
+                                                  0,
+                                                  parsedValue -
+                                                    newData[index].quantity
+                                                );
+                                              // Remove the addedSerialNumbers from supabaseProduct.serial_number
+                                              const updatedSerialNumbers =
+                                                supabaseProduct.serial_number.filter(
+                                                  (serialNumber: string) =>
+                                                    !addedSerialNumbers.includes(
+                                                      serialNumber
+                                                    )
                                                 );
 
                                               // Add the new serial numbers to newData
                                               newData[index].serial_number.push(
                                                 ...addedSerialNumbers
                                               );
+
+                                              // Update the specific supabaseProduct in the state
+                                              const updatedSupabaseProduct = {
+                                                ...supabaseProduct,
+                                                serial_number:
+                                                  updatedSerialNumbers,
+                                              };
                                               console.log(
                                                 "supabase",
-                                                supabaseProduct
+                                                updatedSupabaseProduct
                                               );
                                               console.log("newData", newData);
+                                              // Update the state with the modified data for updatedSupabaseProduct
+                                              setProducts(
+                                                supabaseProducts!.map(
+                                                  (product) =>
+                                                    product.id ===
+                                                    updatedSupabaseProduct.id
+                                                      ? updatedSupabaseProduct
+                                                      : product
+                                                )
+                                              );
                                             } else if (
                                               parsedValue <
                                               newData[index].quantity

@@ -11,6 +11,7 @@ import type {
   TablesUpdate,
 } from "@/types_db";
 import { Product } from "@/app/admin/dashboard/inventory/page";
+import { ProductDelete } from "@/components/supabaseServer";
 
 type Products = TablesInsert<"products">;
 
@@ -49,6 +50,34 @@ const supabaseAdmin = createClient<Database>(
 //   console.log(`Product inserted/updated: ${product.id}`);
 // };
 
+const deletedProductRecord = async (product: ProductDelete) => {
+  const { data: updatedProduct, error: productError } = await supabaseAdmin
+    .from("products")
+    .update({
+      active: false,
+    })
+    .eq("id", product.id)
+    .select();
+  console.log(`Product set inactive: ${updatedProduct}`);
+  if (productError) {
+    throw new Error(`Error updating product: ${productError.message}`);
+  }
+  return updatedProduct;
+};
+
+const updateProductRecord = async (product: ProductDelete) => {
+  const { data, error } = await supabaseAdmin
+    .from("products")
+    .update(product)
+    .eq("id", product.id)
+    .select();
+  console.log(`Product updated: ${data}`);
+  if (error) {
+    throw new Error(`Error updating product: ${error}`);
+  }
+  return data;
+};
+
 const upsertJobRecord = async (job: InsertJob) => {
   const jobData: InsertJob = {
     invoice_id: job.invoice_id,
@@ -66,30 +95,40 @@ const upsertJobRecord = async (job: InsertJob) => {
   const { data: jobs, error: upsertError } = await supabaseAdmin
     .from("jobs")
     .upsert(jobData);
-  if (upsertError)
+  if (upsertError) {
     throw new Error(`Job insert/update failed: ${upsertError.message}`);
+  }
 
   for (const product of job.products!) {
     const { data: existingProduct, error: selectError } = await supabaseAdmin
       .from("products")
       .select("id, quantity_available, serial_number, quantity_sold")
-      .eq("model_number", product.model_number as string);
-
-    const { data: updatedProduct, error: updateError } = await supabaseAdmin
-      .from("products")
-      .update({
-        quantity_available:
-          existingProduct![0].quantity_available! - product.quantity,
-        quantity_sold: existingProduct![0].quantity_sold + product.quantity,
-        serial_number: product.serial_number,
-      })
-      .eq("id", existingProduct![0].id);
-
-    if (updateError) {
-      throw new Error(`Error updating product: ${updateError.message}`);
+      .eq("id", product.id);
+    console.log("existingProduct: ", existingProduct);
+    if (selectError) {
+      throw new Error(`Product select failed: ${selectError.message}`);
     }
+    if (existingProduct) {
+      const updatedSerialNumbers = existingProduct[0].serial_number!.filter(
+        (serialNumber) => !product.serial_number.includes(serialNumber)
+      );
 
-    console.log(`Product updated: ${updatedProduct![0]}`);
+      const { data: updatedProduct, error: updateError } = await supabaseAdmin
+        .from("products")
+        .update({
+          quantity_available:
+            existingProduct![0].quantity_available! - product.quantity,
+          quantity_sold: existingProduct![0].quantity_sold + product.quantity,
+          serial_number: updatedSerialNumbers,
+        })
+        .eq("id", existingProduct![0].id);
+
+      if (updateError) {
+        throw new Error(`Error updating product: ${updateError.message}`);
+      }
+
+      console.log(`Product updated: ${updatedProduct}`);
+    }
   }
 };
 
@@ -129,9 +168,38 @@ const deleteJobRecord = async (job: UpdateJob) => {
     .from("jobs")
     .update(jobData)
     .eq("id", job.id!);
-  if (updateError)
+  if (updateError) {
     throw new Error(`Job insert/update failed: ${updateError.message}`);
+  }
+  for (const product of job.products!) {
+    const { data: existingProduct, error: selectError } = await supabaseAdmin
+      .from("products")
+      .select("id, quantity_sold, quantity_available, serial_number")
+      .eq("model_number", product.id);
+    if (existingProduct) {
+      const updatedQuantity =
+        existingProduct[0].quantity_available! + product.quantity;
+      const updatedSerialNumbers = [
+        ...existingProduct[0].serial_number!,
+        ...product.serial_number,
+      ];
+      const updatedQuantitySold =
+        existingProduct[0].quantity_sold! - product.quantity;
 
+      const { data: updatedProduct, error: productError } = await supabaseAdmin
+        .from("products")
+        .update({
+          quantity_sold: updatedQuantitySold,
+          quantity_available: updatedQuantity,
+          serial_number: updatedSerialNumbers,
+        })
+        .eq("id", existingProduct[0].id);
+      console.log(`Product quantity updated: ${updatedProduct}`);
+      if (productError) {
+        throw new Error(`Error updating product: ${productError.message}`);
+      }
+    }
+  }
   return jobs;
 };
 
@@ -146,16 +214,19 @@ const createProduct = async (product: Product) => {
   }
 
   if (existingProduct && existingProduct.length > 0) {
-    // Product with the same model_number already exists
-    const updatedQuantity = existingProduct[0].quantity_available! + 1;
     // Check if the serial number already exists in the serial_numbers array
     const serialNumberExists = existingProduct[0].serial_number?.includes(
       product.serial_number
     );
+    let updatedQuantity = existingProduct[0].quantity_available!;
 
     let updatedSerialNumbers = [...existingProduct[0].serial_number!];
     if (!serialNumberExists) {
       updatedSerialNumbers.push(product.serial_number!);
+      // Product with the same model_number already exists
+      updatedQuantity = existingProduct[0].quantity_available! + 1;
+    } else {
+      throw new Error(`Serial number exists: ${product.serial_number}`);
     }
 
     const { data: updatedProduct, error: updateError } = await supabaseAdmin
@@ -351,15 +422,15 @@ const upsertPriceRecord = async (
   }
 };
 
-const deleteProductRecord = async (product: Stripe.Product) => {
-  const { error: deletionError } = await supabaseAdmin
-    .from("products")
-    .delete()
-    .eq("id", product.id);
-  if (deletionError)
-    throw new Error(`Product deletion failed: ${deletionError.message}`);
-  console.log(`Product deleted: ${product.id}`);
-};
+// const deleteProductRecord = async (product: Stripe.Product) => {
+//   const { error: deletionError } = await supabaseAdmin
+//     .from("products")
+//     .delete()
+//     .eq("id", product.id);
+//   if (deletionError)
+//     throw new Error(`Product deletion failed: ${deletionError.message}`);
+//   console.log(`Product deleted: ${product.id}`);
+// };
 
 const deletePriceRecord = async (price: Stripe.Price) => {
   const { error: deletionError } = await supabaseAdmin
@@ -566,10 +637,11 @@ export {
   // upsertProductRecord,
   upsertPriceRecord,
   upsertSale,
-  deleteProductRecord,
+  deletedProductRecord,
   deletePriceRecord,
   // createOrRetrieveCustomer,
   manageSubscriptionStatusChange,
+  updateProductRecord,
   upsertCustomer,
   upsertJobRecord,
   updateJobRecord,

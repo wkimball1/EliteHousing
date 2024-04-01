@@ -4,22 +4,33 @@ import {
   useMantineReactTable,
   type MRT_ColumnDef,
   type MRT_Row,
+  MRT_TableOptions,
 } from "mantine-react-table";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css"; //if using mantine date picker features
 import "mantine-react-table/styles.css";
-import { Box, Button, MantineProvider, useMantineTheme } from "@mantine/core";
-import { IconDownload } from "@tabler/icons-react";
+import {
+  ActionIcon,
+  Box,
+  Button,
+  Flex,
+  MantineProvider,
+  Tooltip,
+  useMantineTheme,
+} from "@mantine/core";
+import { IconDownload, IconEdit, IconTrash } from "@tabler/icons-react";
 import { jsPDF } from "jspdf"; //or use your library of choice here
 import autoTable from "jspdf-autotable";
 import { Tables } from "@/types_db";
 import { useState } from "react";
 import balanceFormat from "@/components/balanceFormat";
+import { modals } from "@mantine/modals";
+import { deleteProduct, updateProduct } from "@/components/supabaseServer";
 
-type Product = {
+export type Product = {
   active?: boolean | null;
   description?: string | null;
-  id?: string;
+  id: string;
   image?: string | null;
   name?: string | null;
   price?: number | null;
@@ -43,6 +54,7 @@ const columns: MRT_ColumnDef<Product>[] = [
         {row.original.active?.toString() || false}
       </div>
     ),
+    enableEditing: false,
   },
   { accessorKey: "name", header: "Name", size: 60 },
   { accessorKey: "description", header: "Description", size: 60 },
@@ -53,6 +65,7 @@ const columns: MRT_ColumnDef<Product>[] = [
     Cell: ({ row }) => (
       <div className="capitalize">{balanceFormat(row.getValue("price"))}</div>
     ),
+    enableEditing: false,
   },
   {
     accessorKey: "cost",
@@ -66,8 +79,14 @@ const columns: MRT_ColumnDef<Product>[] = [
     accessorKey: "quantity_sold",
     header: "# Sold",
     size: 60,
+    enableEditing: false,
   },
-  { accessorKey: "quantity_available", header: "# Available", size: 60 },
+  {
+    accessorKey: "quantity_available",
+    header: "# Available",
+    size: 60,
+    enableEditing: false,
+  },
   { accessorKey: "model_number", header: "Model #", size: 60 },
   { accessorKey: "brand", header: "Brand", size: 40 },
 ];
@@ -109,6 +128,27 @@ const ProductsTable = ({ data }: { data: any }) => {
 
     doc.save("HRS-Products.pdf");
   };
+  const handleSaveProduct: MRT_TableOptions<Product>["onEditingRowSave"] =
+    async ({ values, table }) => {
+      // Update the values object with the formatted date
+      const modifiedRow = { ...values };
+      delete modifiedRow.price;
+      await updateProduct(modifiedRow);
+      table.setEditingRow(null); //exit editing mode
+    };
+  //DELETE action
+  const openDeleteConfirmModal = (row: MRT_Row<Product>) => {
+    console.log("Opening delete confirmation modal for row:", row);
+    const modifiedRow = { ...row.original };
+    delete modifiedRow.price;
+    modals.openConfirmModal({
+      title: "Are you sure you want to delete this product?",
+
+      labels: { confirm: "Delete", cancel: "Cancel" },
+      confirmProps: { color: "red" },
+      onConfirm: () => deleteProduct(modifiedRow),
+    });
+  };
 
   const table = useMantineReactTable({
     columns,
@@ -116,9 +156,10 @@ const ProductsTable = ({ data }: { data: any }) => {
     enableRowSelection: true,
     initialState: { density: "xs" },
     columnFilterDisplayMode: "popover",
-    enableEditing: true,
     paginationDisplayMode: "pages",
     positionToolbarAlertBanner: "bottom",
+    enableEditing: true,
+    onEditingRowSave: handleSaveProduct,
     renderTopToolbarCustomActions: ({ table }) => (
       <Box
         style={{
@@ -163,6 +204,20 @@ const ProductsTable = ({ data }: { data: any }) => {
           Export Selected Rows
         </Button>
       </Box>
+    ),
+    renderRowActions: ({ row, table }) => (
+      <Flex gap="md">
+        <Tooltip label="Edit">
+          <ActionIcon onClick={() => table.setEditingRow(row)}>
+            <IconEdit />
+          </ActionIcon>
+        </Tooltip>
+        <Tooltip label="Delete">
+          <ActionIcon color="red" onClick={() => openDeleteConfirmModal(row)}>
+            <IconTrash />
+          </ActionIcon>
+        </Tooltip>
+      </Flex>
     ),
   });
 

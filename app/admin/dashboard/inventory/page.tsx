@@ -46,7 +46,10 @@ export type Product = {
 
 async function getData(): Promise<Product[]> {
   const supabase = createClient();
-  const { data: products, error } = await supabase.from("products").select();
+  const { data: products } = await supabase
+    .from("products")
+    .select("*")
+    .order("brand", { ascending: true });
   console.log("data", products);
 
   if (!products) {
