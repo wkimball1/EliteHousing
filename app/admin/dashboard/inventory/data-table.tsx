@@ -44,7 +44,7 @@ export type Product = {
 };
 
 const columns: MRT_ColumnDef<Product>[] = [
-  { accessorKey: "id", header: "ID", size: 80 },
+  { accessorKey: "id", header: "ID", size: 80, enableEditing: false },
   {
     accessorKey: "active",
     header: "Active",
