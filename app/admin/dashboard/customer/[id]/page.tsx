@@ -108,7 +108,7 @@ const initialTableData: TableRow[] = [
     description: "Description",
     serial_number: [],
     price: 0,
-    quantity: 1,
+    quantity: 0,
     open: false,
     price_id: "",
   },
@@ -149,7 +149,19 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
   const router = useRouter();
 
   const addRow = () => {
-    setTableData((prevData) => [...prevData, ...initialTableData]);
+    setTableData((prevData) => [
+      ...prevData,
+      {
+        id: "",
+        item: "New Item",
+        description: "Description",
+        serial_number: [],
+        price: 0,
+        quantity: 0,
+        open: false,
+        price_id: "",
+      },
+    ]);
   };
 
   const downloadPdf = async (customer: any[]) => {
@@ -160,7 +172,17 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
 
   const deleteRow = (index: number) => {
     const newData = [...tableData];
-    newData.splice(index, 1);
+    const myData = newData.splice(index, 1);
+    const supabaseProduct = supabaseProducts?.find(
+      (product) => product.id === myData[0].id
+    );
+    setProducts({
+      ...supabaseProduct,
+      serial_number: supabaseProduct.serial_number.unshift(
+        myData[0].serial_number
+      ),
+    });
+
     setTableData(newData);
   };
 
@@ -200,7 +222,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
           .select("*")
           .order("brand", { ascending: true });
         setProducts(products);
-        console.log(products);
+        console.log("supabaseProducts", products);
 
         const { data: prices } = await supabase.from("prices").select("*");
         setPrices(prices);
@@ -213,20 +235,20 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
         });
         if (stripeCustomerInvoices) {
           const validInvoices = stripeCustomerInvoices.filter(
-            (invoice: any) =>
+            (invoice: Invoice) =>
               invoice.status !== "Void" && invoice.status !== "Uncollectable"
           );
 
           // Extract amounts due from each valid invoice and sum them up
           const totalAmountDue = validInvoices.reduce(
-            (total: any, invoice: { amount_remaining: any }) =>
+            (total: number, invoice: Invoice) =>
               total + invoice.amount_remaining,
             0
           );
           setBalance(totalAmountDue);
 
           const notVoidInvoices = stripeCustomerInvoices.filter(
-            (invoice: any) => invoice.status !== "Void"
+            (invoice: Invoice) => invoice.status !== "Void"
           );
 
           const updatedInvoices = notVoidInvoices.map((invoice: any) => {
@@ -681,47 +703,120 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                                     value={row.quantity}
                                     onChange={(e) => {
                                       const newData = [...tableData];
-                                      const parsedValue = parseInt(
-                                        e.target.value,
-                                        10
-                                      );
 
-                                      // Check if parsedValue is a valid number and greater than or equal to 0
-                                      if (
-                                        !isNaN(parsedValue) &&
-                                        parsedValue >= 0
-                                      ) {
-                                        // Find the supabaseProduct with matching ID
-                                        const supabaseProduct =
-                                          supabaseProducts?.find(
-                                            (product) => product.id === row.id
-                                          );
+                                      // Check if the input is not empty
+                                      if (e.target.value !== "") {
+                                        const parsedValue = parseInt(
+                                          e.target.value,
+                                          10
+                                        );
 
-                                        // Check if supabaseProduct exists and if the selected quantity is less than or equal to available inventory (number of serial numbers)
+                                        // Check if parsedValue is a valid number and greater than or equal to 0
                                         if (
-                                          supabaseProduct &&
-                                          parsedValue <=
-                                            supabaseProduct.serial_number.length
+                                          !isNaN(parsedValue) &&
+                                          parsedValue >= 0
                                         ) {
-                                          newData[index].quantity = parsedValue;
-
-                                          // Set serial_number to a slice of supabaseProduct.serial_number based on selected quantity
-                                          newData[index].serial_number =
-                                            supabaseProduct.serial_number.slice(
-                                              0,
-                                              parsedValue
+                                          // Find the supabaseProduct with matching ID
+                                          const supabaseProduct =
+                                            supabaseProducts?.find(
+                                              (product) => product.id === row.id
                                             );
 
-                                          setTableData(newData);
+                                          // Check if supabaseProduct exists and if the selected quantity is less than or equal to available inventory (number of serial numbers)
+                                          if (
+                                            supabaseProduct &&
+                                            parsedValue <=
+                                              supabaseProduct.serial_number
+                                                .length
+                                          ) {
+                                            if (
+                                              parsedValue >
+                                              newData[index].quantity
+                                            ) {
+                                              // Increase in quantity, take serial numbers from supabaseProduct and add to newData
+                                              const addedSerialNumbers =
+                                                supabaseProduct.serial_number.slice(
+                                                  newData[index].quantity,
+                                                  parsedValue
+                                                );
+
+                                              // Add the new serial numbers to newData
+                                              newData[index].serial_number.push(
+                                                ...addedSerialNumbers
+                                              );
+                                              console.log(
+                                                "supabase",
+                                                supabaseProduct
+                                              );
+                                              console.log("newData", newData);
+                                            } else if (
+                                              parsedValue <
+                                              newData[index].quantity
+                                            ) {
+                                              // Decrease in quantity, take serial numbers from newData and add back to supabaseProduct
+                                              const removedSerialNumbers =
+                                                newData[
+                                                  index
+                                                ].serial_number.slice(
+                                                  parsedValue
+                                                );
+
+                                              // Remove the used serial numbers from newData
+                                              newData[index].serial_number =
+                                                newData[
+                                                  index
+                                                ].serial_number.slice(
+                                                  0,
+                                                  parsedValue
+                                                );
+
+                                              // Add the removed serial numbers back to supabaseProduct
+                                              const updatedSerialNumbers = [
+                                                ...supabaseProduct.serial_number,
+                                                ...removedSerialNumbers,
+                                              ];
+
+                                              // Update the specific supabaseProduct in the state
+                                              const updatedSupabaseProduct = {
+                                                ...supabaseProduct,
+                                                serial_number:
+                                                  updatedSerialNumbers,
+                                              };
+                                              console.log(
+                                                "supabase",
+                                                updatedSupabaseProduct
+                                              );
+                                              console.log("newData", newData);
+                                              // Update the state with the modified data for updatedSupabaseProduct
+                                              setProducts(
+                                                supabaseProducts!.map(
+                                                  (product) =>
+                                                    product.id ===
+                                                    updatedSupabaseProduct.id
+                                                      ? updatedSupabaseProduct
+                                                      : product
+                                                )
+                                              );
+                                            }
+
+                                            // Update quantity in newData
+                                            newData[index].quantity =
+                                              parsedValue;
+
+                                            // Update the state with the modified data for newData
+                                            setTableData(newData);
+                                          } else {
+                                            // Handle the case where selected quantity exceeds available inventory
+                                            console.error(
+                                              "Selected quantity exceeds available inventory"
+                                            );
+                                          }
                                         } else {
-                                          // Display an error message or handle the case where selected quantity exceeds available inventory
+                                          // Handle the case where the input is not a valid positive number
                                           console.error(
-                                            "Selected quantity exceeds available inventory"
+                                            "Invalid quantity input"
                                           );
                                         }
-                                      } else {
-                                        // Handle the case where the input is not a valid positive number, e.g., display an error message
-                                        console.error("Invalid quantity input");
                                       }
                                     }}
                                   />
