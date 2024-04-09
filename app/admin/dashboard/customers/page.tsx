@@ -105,7 +105,7 @@ export default function CustomersPage() {
         <div className="pb-4">
           <Dialog>
             <DialogTrigger asChild>
-              <Button color="grey" leftSection={<PlusIcon />}>
+              <Button color="gray" leftSection={<PlusIcon />}>
                 Create new customer
               </Button>
             </DialogTrigger>
@@ -242,7 +242,7 @@ export default function CustomersPage() {
         </div>
         <CustomerTable data={data} />
       </div>
-      <Button color="grey" onClick={() => addCustomers()}>
+      <Button color="gray" onClick={() => addCustomers()}>
         Do not click
       </Button>
     </div>

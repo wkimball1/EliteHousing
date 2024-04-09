@@ -150,7 +150,7 @@ export default function InventoryPage() {
         <div className="pb-4 ">
           <Dialog>
             <DialogTrigger asChild>
-              <Button color="grey" leftSection={<PlusIcon />}>
+              <Button color="gray" leftSection={<PlusIcon />}>
                 Add new Product
               </Button>
             </DialogTrigger>
@@ -276,7 +276,7 @@ export default function InventoryPage() {
         <ProductsTable data={data} />
       </div>
       <span className="pt-4" />
-      <Button color="grey" onClick={loadProducts}>
+      <Button color="gray" onClick={loadProducts}>
         Do Not Click
       </Button>
     </div>
