@@ -16,7 +16,6 @@ export default async function LoginPage({
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    console.log(user);
 
     if (user) {
       // If user is already logged in, redirect to dashboard

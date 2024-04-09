@@ -39,15 +39,10 @@ function JobsPage() {
         <Tabs defaultValue="all-jobs" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="all-jobs">All Jobs</TabsTrigger>
-            <TabsTrigger value="current-jobs">Current Jobs</TabsTrigger>
-            <TabsTrigger value="past-jobs">Past Jobs</TabsTrigger>
           </TabsList>
           <TabsContent value="all-jobs">
             <JobsTable data={supabaseJobs || []} />
           </TabsContent>
-
-          <TabsContent value="current-jobs"></TabsContent>
-          <TabsContent value="past-jobs"></TabsContent>
         </Tabs>
       </div>
     </div>
