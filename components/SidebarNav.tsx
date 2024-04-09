@@ -1,5 +1,4 @@
 import React from "react";
-import Link from "next/link";
 import { FiMenu as Icon } from "react-icons/fi";
 import { FaUser } from "react-icons/fa";
 import defaultLogo from "@/img/logo.png";
@@ -36,7 +35,7 @@ export default function Sidebar() {
         {isSidebarOpen && (
           <ul className="menu p-2 w-72 z-50 min-h-full bg-background text-base-content">
             <li className="user-select-none hover:bg-background focus:bg-background">
-              <Link
+              <a
                 href="/admin/dashboard/customers"
                 className="user-select-none hover:bg-background focus:bg-background"
               >
@@ -54,29 +53,29 @@ export default function Sidebar() {
                   height={150}
                   className="darkLogo"
                 />
-              </Link>
+              </a>
             </li>
 
             <li>
-              <Link href="/admin/dashboard/customers">Home</Link>
+              <a href="/admin/dashboard/customers">Home</a>
             </li>
             <li>
-              <Link href="/admin/dashboard/employees">Employees</Link>
+              <a href="/admin/dashboard/employees">Employees</a>
             </li>
             <li>
-              <Link href="/admin/dashboard/customers">Customers</Link>
+              <a href="/admin/dashboard/customers">Customers</a>
             </li>
             <li>
-              <Link href="/admin/dashboard/inventory">Inventory</Link>
+              <a href="/admin/dashboard/inventory">Inventory</a>
             </li>
             <li>
-              <Link href="/admin/dashboard/sales">Sales</Link>
+              <a href="/admin/dashboard/sales">Sales</a>
             </li>
             <li>
-              <Link href="/admin/dashboard/jobs">Jobs</Link>
+              <a href="/admin/dashboard/jobs">Jobs</a>
             </li>
             <li>
-              <Link href="/">Client Website</Link>
+              <a href="/">Client Website</a>
             </li>
             <li className="user-select-none hover:bg-background focus:bg-background">
               <AuthButton />
