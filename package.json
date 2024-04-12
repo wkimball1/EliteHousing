@@ -9,6 +9,7 @@
     "stripe:listen": "stripe listen --forward-to=localhost:3000/api/webhooks/stripe"
   },
   "dependencies": {
+    "@emotion/cache": "^11.11.0",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
     "@heroicons/react": "^2.1.1",

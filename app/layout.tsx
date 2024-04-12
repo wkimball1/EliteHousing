@@ -54,6 +54,7 @@ export default function RootLayout({
         >
           <Suspense fallback={<Loading />}>
             <main className="min-h-screen w-full max-w-full flex flex-col">
+              <ColorSchemeScript defaultColorScheme="auto" />
               <MantineProvider defaultColorScheme="auto">
                 <ModalsProvider>{children}</ModalsProvider>
               </MantineProvider>

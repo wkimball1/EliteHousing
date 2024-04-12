@@ -2,16 +2,15 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createClient, updateSession } from "@/utils/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
+  const { user, response } = await updateSession(request);
 
-  const {user, response} =  await updateSession(request);
-
-  if (request.nextUrl.pathname.startsWith('/admin/') && !user) {
-      return NextResponse.redirect(new URL('/admin', request.url))
+  if (request.nextUrl.pathname.startsWith("/admin/") && !user) {
+    console.log("middleware issue");
+    return NextResponse.redirect(new URL("/admin", request.url));
   }
+  console.log("middleware");
 
-
-
-  return response
+  return response;
 }
 
 export const config = {

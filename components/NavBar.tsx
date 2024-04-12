@@ -110,7 +110,7 @@ export default function NavBar() {
     <Box pb={10}>
       <header className={`bg-background ${classes.header}`}>
         <Group justify="space-between" h="100%">
-          <Link className="flex justify-start" href="/">
+          <a className="flex justify-start" href="/">
             <img
               src={defaultLogo.src}
               alt="Company Logo"
@@ -125,7 +125,7 @@ export default function NavBar() {
               height={150}
               className="darkLogo"
             />
-          </Link>
+          </a>
 
           <Group h="100%" gap={0} visibleFrom="sm">
             <a href="/" className={classes.link}>

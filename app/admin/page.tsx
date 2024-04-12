@@ -1,7 +1,6 @@
 "use server";
-import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
-import { redirect } from "next/navigation";
+import { permanentRedirect, redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import AuthButton from "@/components/AuthButton";
 import NavBar from "@/components/NavBar";

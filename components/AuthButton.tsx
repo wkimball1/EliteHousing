@@ -27,11 +27,11 @@ export default async function AuthButton() {
       </form>
     </div>
   ) : (
-    <Link
+    <a
       href="/admin"
       className="py-2 px-3 flex rounded-md no-underline bg-btn-background hover:bg-btn-background-hover"
     >
       Login
-    </Link>
+    </a>
   );
 }

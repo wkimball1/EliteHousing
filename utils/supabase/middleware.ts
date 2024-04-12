@@ -54,15 +54,17 @@ export const createClient = (request: NextRequest) => {
           });
         },
       },
-    },
+    }
   );
 
   return { supabase, response };
 };
 
 export const updateSession = async (request: NextRequest) => {
-    const { supabase, response } = createClient(request);
-    const {data: {user}} = await supabase.auth.getUser();
-    return {user, response};
+  const { supabase, response } = createClient(request);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
+  return { user, response };
 };

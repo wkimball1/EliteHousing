@@ -77,7 +77,7 @@ export default function Sidebar() {
             <li>
               <a href="/">Client Website</a>
             </li>
-            <li className="user-select-none hover:bg-background focus:bg-background">
+            <li className="user-select-none bg-background hover:bg-background focus:bg-background">
               <AuthButton />
             </li>
           </ul>
