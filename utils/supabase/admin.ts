@@ -146,6 +146,16 @@ const updateJobRecord = async (job: UpdateJob) => {
     invoice_status: job.invoice_status,
     address: job.address,
   };
+
+  const { data: jobs, error: updateError } = await supabaseAdmin
+    .from("jobs")
+    .update(jobData)
+    .eq("id", job.id!);
+  if (updateError) {
+    throw new Error(`Job insert/update failed: ${updateError.message}`);
+  }
+
+  return jobs;
 };
 
 const deleteJobRecord = async (job: UpdateJob) => {

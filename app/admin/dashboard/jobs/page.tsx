@@ -21,6 +21,7 @@ function JobsPage() {
         let { data, error } = await supabase
           .from("jobs")
           .select("*")
+          .order("created_at", { ascending: true })
           .neq("is_deleted", true);
         setJobs(data);
         console.log(data);

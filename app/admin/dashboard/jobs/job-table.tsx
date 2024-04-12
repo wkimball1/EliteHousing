@@ -63,21 +63,25 @@ const JobsTable = ({ data }: { data: Jobs[] }) => {
         header: "Start Date",
         size: 40,
         Cell: ({ row }) => {
-          const currentDate = new Date(row.original.created_at);
+          // Assuming row.original.created_at is in the format "yyyy-mm-dd HH:mm:ss.ssssss+00"
+          const inputDate = row.original.created_at.split(" ")[0]; // Extracting the date part
 
-          // Create an Intl.DateTimeFormat object for Eastern Time
-          const easternTimeFormatter = new Intl.DateTimeFormat("en-US", {
-            timeZone: "America/New_York", // 'America/New_York' corresponds to Eastern Time
+          // Create a Date object from the input date string
+          const currentDate = new Date(inputDate);
+
+          // Create an Intl.DateTimeFormat object for formatting the date
+          const dateFormatter = new Intl.DateTimeFormat("en-US", {
             year: "numeric",
             month: "2-digit",
             day: "2-digit",
           });
 
-          // Format the date in Eastern Time
-          const formattedDate = easternTimeFormatter.format(currentDate);
+          // Format the date using the dateFormatter object
+          const formattedDate = dateFormatter.format(currentDate);
 
           return <div>{formattedDate}</div>;
         },
+
         enableEditing: false,
       },
       {
@@ -116,9 +120,34 @@ const JobsTable = ({ data }: { data: Jobs[] }) => {
         size: 120,
         mantineEditTextInputProps: {
           error: validationErrors?.work_completed_date,
-          placeholder: "mm/dd/yyyy",
+          placeholder: "yyyy-mm-dd",
         },
+        // Cell: ({ row }) => {
+        //   // Check if work_completed_date is not null and not undefined
+        //   if (row.original.work_completed_date != null) {
+        //     const currentDate = new Date(
+        //       row.original.work_completed_date.toString()
+        //     );
+
+        //     // Create an Intl.DateTimeFormat object for Eastern Time
+        //     const easternTimeFormatter = new Intl.DateTimeFormat("en-US", {
+        //       timeZone: "America/New_York", // 'America/New_York' corresponds to Eastern Time
+        //       year: "numeric",
+        //       month: "2-digit",
+        //       day: "2-digit",
+        //     });
+
+        //     // Format the date in Eastern Time
+        //     const formattedDate = easternTimeFormatter.format(currentDate);
+
+        //     return <div>{formattedDate}</div>;
+        //   } else {
+        //     // Handle case where work_completed_date is null or undefined
+        //     return <div></div>; // Or any other placeholder or message
+        //   }
+        // },
       },
+
       {
         accessorKey: "products",
         header: "Products",
@@ -189,7 +218,17 @@ const JobsTable = ({ data }: { data: Jobs[] }) => {
       // Process each column
       columns.forEach((column) => {
         const value = row.original[column.accessorKey as keyof Jobs];
-        if (column.accessorKey === "products" && Array.isArray(value)) {
+
+        // Check if the column is "start_date" and the value is a date string
+        if (column.accessorKey === "created_at" && typeof value === "string") {
+          const startDate = new Date(value);
+          const month = startDate.toLocaleString("default", { month: "long" });
+          const day = startDate.getDate();
+          const year = startDate.getFullYear();
+          const formattedStartDate = `${month} ${day}, ${year}`;
+
+          rowData.push(formattedStartDate);
+        } else if (column.accessorKey === "products" && Array.isArray(value)) {
           // If the column is "Products" and the value is an array, format the products data
           const productString = value
             .map(
@@ -246,13 +285,40 @@ const JobsTable = ({ data }: { data: Jobs[] }) => {
     values,
     table,
   }) => {
-    const formattedDate = convertDateFormat(values.work_completed_date);
+    let formattedDate = null;
 
-    // Update the values object with the formatted date
+    // Check if values.work_completed_date is already in "YYYY-MM-DD" format
+    const dateFormatPattern = /^\d{4}-\d{2}-\d{2}$/; // YYYY-MM-DD pattern
+    if (
+      values.work_completed_date &&
+      dateFormatPattern.test(values.work_completed_date)
+    ) {
+      formattedDate = values.work_completed_date; // Use the existing date format as is
+    } else if (
+      values.work_completed_date &&
+      typeof values.work_completed_date === "string"
+    ) {
+      // Convert the date to the desired format if it's a valid date string
+      formattedDate = convertDateFormat(values.work_completed_date);
+
+      // Check if formattedDate is a valid date string
+      if (!formattedDate || typeof formattedDate !== "string") {
+        console.error("Invalid formatted date:", formattedDate);
+        // Handle invalid date formatting, e.g., show an error message
+      }
+    } else {
+      console.error("Invalid input date:", values.work_completed_date);
+      // Handle invalid input date or missing date, e.g., show an error message
+    }
+
+    // Update the job with or without the formatted date
     const updatedValues = { ...values, work_completed_date: formattedDate };
+    console.log(updatedValues);
     await updateJob(updatedValues);
-    table.setEditingRow(null); //exit editing mode
+    table.setEditingRow(null);
+    window.location.reload(); //exit editing mode
   };
+
   //DELETE action
   const openDeleteConfirmModal = (row: MRT_Row<Jobs>) => {
     console.log("Opening delete confirmation modal for row:", row);
