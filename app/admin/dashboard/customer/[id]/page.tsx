@@ -379,6 +379,8 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
         price_id: "",
       },
     ]);
+
+    window.location.reload();
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
