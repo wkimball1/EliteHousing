@@ -5,10 +5,8 @@ export async function middleware(request: NextRequest) {
   const { user, response } = await updateSession(request);
 
   if (request.nextUrl.pathname.startsWith("/admin/") && !user) {
-    console.log("middleware issue");
     return NextResponse.redirect(new URL("/admin", request.url));
   }
-  console.log("middleware");
 
   return response;
 }

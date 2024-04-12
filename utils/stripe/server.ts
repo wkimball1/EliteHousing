@@ -1585,6 +1585,7 @@ export async function createStripePortal(
 ) {
   try {
     try {
+      console.log(currentPath);
       const { url } = await stripe.billingPortal.sessions.create({
         customer: customerId!,
         return_url: getURL(currentPath),

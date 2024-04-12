@@ -1,55 +1,40 @@
-"use server";
-import { createClient } from "@/utils/supabase/server";
-import { permanentRedirect, redirect } from "next/navigation";
+"use client";
+import { createClient } from "@/utils/supabase/client";
+import { permanentRedirect, redirect, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import AuthButton from "@/components/AuthButton";
 import NavBar from "@/components/NavBar";
+import { revalidatePath } from "next/cache";
+import { login } from "./actions";
+import { useEffect } from "react";
 
-export default async function LoginPage({
+export default function LoginPage({
   searchParams,
 }: {
   searchParams: { message: string };
 }) {
   const supabase = createClient();
-  async function checkLoggedIn() {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (user) {
-      // If user is already logged in, redirect to dashboard
-      redirect("/admin/dashboard/customers");
-    }
-  }
-
-  const signIn = async (formData: FormData) => {
-    "use server";
-
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const supabase = createClient();
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      redirect("/admin?message=Could not authenticate user");
+  const router = useRouter();
+  useEffect(() => {
+    async function checkLoggedIn() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        // If user is already logged in, redirect to dashboard
+        router.replace("/admin/dashboard/customers");
+      }
     }
 
-    redirect("/admin/dashboard/customers");
-  };
-  await checkLoggedIn();
+    checkLoggedIn();
+  }, []);
+
   return (
     <div className="flex-1 flex flex-col w-full">
       <NavBar />
 
       <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md self-center justify-center gap-2">
-        <form
-          className="animate-in flex-1 flex flex-col w-full justify-center gap-2 text-foreground"
-          action={signIn}
-        >
+        <form className="animate-in flex-1 flex flex-col w-full justify-center gap-2 text-foreground">
           <label className="text-md" htmlFor="email">
             Email
           </label>
@@ -69,9 +54,7 @@ export default async function LoginPage({
             placeholder="••••••••"
             required
           />
-          <Button className="px-4 py-2 font-sans text-xs font-bold text-center text-foreground uppercase align-middle transition-all rounded-lg select-none hover:bg-background/10 active:bg-background/20 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none sm:inline-block">
-            Sign In
-          </Button>
+          <Button formAction={login}>Log in</Button>
           {searchParams?.message && (
             <p className="mt-4 p-4 bg-foreground/10 text-foreground text-center">
               {searchParams.message}

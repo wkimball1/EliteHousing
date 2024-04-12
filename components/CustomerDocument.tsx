@@ -114,7 +114,7 @@ const MyDocument = ({ customer }: { customer: any[] }) => {
                   </View>
                   <View style={styles.tableCell}>
                     <Text style={styles.content}>
-                      {balanceFormat((product.price / 100).toString())}
+                      {balanceFormat(product.price.toString())}
                     </Text>
                   </View>
                   <View style={styles.tableCell}>
