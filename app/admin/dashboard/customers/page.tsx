@@ -28,7 +28,10 @@ type Customer = Tables<"customers">;
 
 async function getData(): Promise<Customer[]> {
   const supabase = createClient();
-  const { data: customer } = await supabase.from("customers").select("*");
+  const { data: customer } = await supabase
+    .from("customers")
+    .select("*")
+    .order("full_name", { ascending: true });
   console.log(customer);
   // Fetch data from your API here.
   return customer || [];
