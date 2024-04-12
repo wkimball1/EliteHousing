@@ -124,6 +124,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
   const [downloadCust, setDownloadCust] = useState<any[] | null>([]);
   const [value, setValue] = useState("");
   const [balance, setBalance] = useState(0);
+  const [paid, setPaid] = useState(0);
   const [total, setTotal] = useState(0);
   const [billing, setBilling] = useState<any | null>({
     line1: "",
@@ -217,18 +218,18 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
     (async () => {
       setIsLoading(true);
       const custId = params.id;
-      console.log(params);
+
       try {
         const { data: customer } = await supabase
           .from("customers")
           .select("*")
           .eq("id", custId);
         setCustomer(customer);
-        console.log(customer);
+
         const {
           data: { user },
         } = await supabase.auth.getUser();
-        console.log(user!.id);
+
         setNewInvoice({
           ...invoiceData,
           customer: custId,
@@ -241,13 +242,12 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
           .eq("active", true) // Fetch products where is_deleted is not true
           .order("brand", { ascending: true });
         setProducts(products);
-        console.log("supabaseProducts", products);
 
         const { data: prices } = await supabase.from("prices").select("*");
         setPrices(prices);
-        console.log(prices);
+
         const existingStripeCustomer = await retrieveCustomer({ id: custId! });
-        console.log(existingStripeCustomer);
+
         setStripeCustomer(existingStripeCustomer);
         const stripeCustomerInvoices = await retrieveCustomerInvoices({
           id: custId!,
@@ -265,6 +265,11 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
             0
           );
           setBalance(totalAmountDue);
+          const totalAmountPaid = validInvoices.reduce(
+            (total: number, invoice: Invoice) => total + invoice.amount_paid,
+            0
+          );
+          setPaid(totalAmountPaid);
 
           const notVoidInvoices = stripeCustomerInvoices.filter(
             (invoice: Invoice) => invoice.status !== "Void"
@@ -943,6 +948,17 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
               <CardContent className="grid gap-2 items-center justify-center">
                 <p className="text-xs md:text-xl">
                   {balanceFormat(balance.toString())}
+                </p>
+              </CardContent>
+              <CardFooter></CardFooter>
+            </Card>
+            <Card className="w-25 h-25 md:w-32 lg:w-60 bg-background ">
+              <CardHeader className="items-center text-sm md:text-xl">
+                <CardTitle>Total Paid</CardTitle>
+              </CardHeader>
+              <CardContent className="grid gap-2 items-center justify-center">
+                <p className="text-xs md:text-xl">
+                  {balanceFormat(paid.toString())}
                 </p>
               </CardContent>
               <CardFooter></CardFooter>
