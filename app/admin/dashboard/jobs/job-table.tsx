@@ -189,47 +189,33 @@ const JobsTable = ({ data }: { data: Jobs[] }) => {
       // Process each column
       columns.forEach((column) => {
         const value = row.original[column.accessorKey as keyof Jobs];
-
-        // Check if the column is "Products"
-        if (column.accessorKey === "products") {
-          // If yes, format the products data
-          if (Array.isArray(value)) {
-            const productString = value
-              .map(
-                (product) =>
-                  `${product.id} (Quantity: ${product.quantity || ""})`
-              )
-              .join(", ");
-            rowData.push(productString);
-          } else {
-            rowData.push(value === null ? "" : String(value));
-          }
-        } else if (column.accessorKey === "address") {
-          // If yes, format the shipping address
-          if (typeof value === "object" && value !== null) {
-            const addressString = `${value.line1}${
-              value.line1 && value.line2 ? ", " : ""
-            }${value.line2}${value.line1 && value.city ? ", " : ""}${
-              value.city
-            }${value.city && value.state ? ", " : ""}${value.state}${
-              (value.line1 || value.city || value.state) && value.postal_code
-                ? " "
-                : ""
-            }${value.postal_code || ""}`;
-            rowData.push(addressString);
-          } else {
-            rowData.push(value === null ? "" : String(value));
-          }
+        if (column.accessorKey === "products" && Array.isArray(value)) {
+          // If the column is "Products" and the value is an array, format the products data
+          const productString = value
+            .map(
+              (product) => `${product.id} (Quantity: ${product.quantity || ""})`
+            )
+            .join(", ");
+          rowData.push(productString);
+        } else if (
+          column.accessorKey === "address" &&
+          typeof value === "object" &&
+          value !== null
+        ) {
+          // If the column is "Address" and the value is an object (address), format the address
+          const addressString = `${value.line1}${
+            value.line1 && value.line2 ? ", " : ""
+          }${value.line2}${value.line1 && value.city ? ", " : ""}${value.city}${
+            value.city && value.state ? ", " : ""
+          }${value.state}${
+            (value.line1 || value.city || value.state) && value.postal_code
+              ? " "
+              : ""
+          }${value.postal_code || ""}`;
+          rowData.push(addressString);
         } else {
-          // If not "Products", format other columns
-          if (Array.isArray(value)) {
-            rowData.push(
-              value
-                .flat()
-                .map((item) => (item === null ? "" : String(item)))
-                .join(", ")
-            );
-          } else if (typeof value === "object" && value !== null) {
+          // For other columns, handle as before
+          if (typeof value === "object" && value !== null) {
             rowData.push(JSON.stringify(value));
           } else {
             rowData.push(value === null ? "" : String(value));
@@ -240,12 +226,11 @@ const JobsTable = ({ data }: { data: Jobs[] }) => {
       return rowData;
     });
 
-    const flattenedTableData: string[] = tableData.flat();
     const tableHeaders = columns.map((c) => c.header);
 
     autoTable(doc, {
       head: [tableHeaders],
-      body: [flattenedTableData],
+      body: tableData, // Pass tableData directly here
 
       styles: {
         overflow: "linebreak",
@@ -256,6 +241,7 @@ const JobsTable = ({ data }: { data: Jobs[] }) => {
 
     doc.save("HRS-Jobs.pdf");
   };
+
   const handleSaveJob: MRT_TableOptions<Jobs>["onEditingRowSave"] = async ({
     values,
     table,
